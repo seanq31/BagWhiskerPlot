@@ -9,6 +9,9 @@ This package exposes a single high-level function:
 ## Usage example
 
 ```r
+library(devtools)
+install_github('seanq31/BagWhiskerPlot')
+
 library(BagWhiskerPlot)
 
 set.seed(1)
