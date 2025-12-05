@@ -25,3 +25,5 @@ dat_cont1[1:k1, ] <- contam1
 bag_whisker(dat_clean, type1 = 'FDR', q = 0.1, main = "Clean")
 bag_whisker(dat_cont1, type1 = 'FDR', q = 0.1, main = paste0("Contaminated ", contam_frac1 * 100, "%"))
 ```
+
+Code for the figures in the paper can be found under the `vignette` folder.
