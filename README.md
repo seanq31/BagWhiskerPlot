@@ -4,7 +4,9 @@ Implementation for the paper 'The Bag-and-Whisker Plot: A New Bagplot for Bivari
 
 This package exposes a single high-level function:
 
-- `bag_whisker(x, y, ...)` — compute and (by default) plot a bag-and-whisker plot. `x` and `y` are numeric vectors or `x` may be a two-column matrix/data.frame.
+- `bag_whisker(x, y, ...)` — compute and (by default) plot a bag-and-whisker plot. `x` and `y` are numeric vectors or `x` may be a two-column matrix/data.frame. 
+- `type1` can be either `'FDR'`, `'FWER'`, `'PFER'` or `'unadjusted'`. `q` is the control level for the multiple testing procedure. 
+- When `type1` is set to `'unadjusted'`, the factor lambda is set as the value `factor` (with default value `3`).
 
 ## Usage example
 

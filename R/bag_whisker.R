@@ -12,13 +12,8 @@
 #' @param type1 Character string specifying the type-I error control used in
 #'   the multiple-testing step. One of `"unadjusted"`, `"FWER"`, `"FDR"`,
 #'   or `"PFER"`.
-#' @param q Numeric, the control level for the type-I error measure.
-#' @param factor Numeric, expansion factor used to construct the outer loop
-#'   from the central bag.
-#' @param normal_inlier,normal_outter Logical flags for using normal-theory
-#'   based calibration for inner / outer regions (advanced; see paper).
-#' @param conservative_lambda Numeric tuning parameter used in the
-#'   multiple-testing adjustment.
+#' @param q Numeric, the control level for the multiple testing procedure.
+#' @param factor Numeric, the factor lambda for `"unadjusted"``.
 #' @param redefine_loop Logical; if `TRUE`, the loop (outer hull) may be
 #'   recomputed after multiple-testing.
 #' @param asymp_dist_pv Character string; asymptotic distribution used for
@@ -28,7 +23,7 @@
 #'   otherwise medians are used to impute.
 #' @param approx.limit Integer; threshold above which a subsample is used for
 #'   approximating the bag-plot computation.
-#' @param dkmethod Integer in `1:2`; depth kernel method, with `2` recommended.
+#' @param dkmethod Integer in `1:2`; depth kernel method, with `1` recommended.
 #' @param precision Numeric; controls precision of hull expansion.
 #' @param show Logical; if `TRUE` (default), a plot is produced via
 #'   [plot.bagWhiskerPlot()]. If `FALSE`, only the computed object is
