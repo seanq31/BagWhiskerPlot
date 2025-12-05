@@ -1,0 +1,4 @@
+export(bag_whisker)
+
+# S3 methods for plotting
+S3method(plot, bagWhiskerPlot)
