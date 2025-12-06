@@ -50,8 +50,8 @@ bag_whisker <- function(
     normal_inlier = FALSE,
     normal_outter = FALSE, # shape of the outerfence, according to normal or multiple of inner bag
     conservative_lambda = 0,
-    asymp_dist_pv = 'chisq',
-    center_type = 'hdepth',
+    asymp_dist_pv = "chisq",
+    center_type = "hdepth",
     redefine_loop = TRUE, # if TRUE loop is redefined by fence_mag_bag
     factor = 3, # expanding factor for bag to get the loop
     na.rm = FALSE, # should 'NAs' values be removed or exchanged
@@ -94,7 +94,7 @@ bag_whisker <- function(
     precision = precision, verbose = verbose, debug.plots = debug.plots
   )
   if (create.plot) {
-    tmp_plt = plot(bo,
+    tmp_plt <- plot(bo,
       show.outlier = show.outlier,
       show.whiskers = show.whiskers,
       show.looppoints = show.looppoints,

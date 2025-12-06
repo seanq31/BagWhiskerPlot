@@ -6,8 +6,8 @@ compute.bagWhiskerPlot <- function(
     normal_outter = F,
     conservative_lambda = 0,
     redefine_loop = FALSE,
-    asymp_dist_pv = 'chisq',
-    center_type = 'hdepth',
+    asymp_dist_pv = "chisq",
+    center_type = "hdepth",
     na.rm = FALSE, # should NAs removed or exchanged
     approx.limit = 300, # limit
     dkmethod = 2, # in 1:2; method 2 is recommended
@@ -413,7 +413,7 @@ compute.bagWhiskerPlot <- function(
       # hdepth[j]<-init+min(h)+sum(xy[j,1]==xy[,1] & xy[j,2]==xy[,2])
     }
   }
-  
+
   hdepth <- find.hdepths(xy, 181 * precision)
   # print(cbind(xy, hdepth)) # Added to print points and their hdepth
   if (verbose) {
@@ -463,9 +463,9 @@ compute.bagWhiskerPlot <- function(
   }
   # D.K<<-d.k; K.1<<-k.1; EX<<-exp.dk; EX.1<<-exp.dk.1; PDK<<-pdk; HDEPTH<<-hdepth
 
-  if (center_type == 'hdepth') {
+  if (center_type == "hdepth") {
     center <- apply(xy[which(hdepth == max(hdepth)), , drop = FALSE], 2, mean)
-  } else if (center_type == 'mcd') {
+  } else if (center_type == "mcd") {
     center <- cov.mcd(xy)$center
   }
   hull.center <- NULL
@@ -710,9 +710,9 @@ compute.bagWhiskerPlot <- function(
     hull.center <- apply(xydata[which(hdepth == max(hdepth)), , drop = FALSE], 2, mean)
     # browser()
     if (!any(is.na(hull.center))) {
-      if (center_type == 'hdepth') {
+      if (center_type == "hdepth") {
         center <- find.polygon.center(hull.center)
-      } else if (center_type == 'mcd') {
+      } else if (center_type == "mcd") {
         center <- cov.mcd(xydata)$center
       }
     } else {
@@ -1224,14 +1224,14 @@ compute.bagWhiskerPlot <- function(
     # mah_dist_sq <- mahalanobis(xydata, center = estcov$center, cov = estcov$cov)
     mah_dist_sq <- mahalanobis(xydata, center = center, cov = estcov$cov)
     # print(mah_dist_sq)
-    if (asymp_dist_pv == 'chisq') {
+    if (asymp_dist_pv == "chisq") {
       p_values <- pchisq(mah_dist_sq, df = 2, lower.tail = FALSE)
       # print(p_values)
       # browser()
-    } else if (asymp_dist_pv == 'F') {
+    } else if (asymp_dist_pv == "F") {
       s_diag_F <- diag(estcov$cov)
       c_hat_F <- mean(s_diag_F)
-      m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F)) ^ 2)
+      m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F))^2)
       # temp_c_m <- .est_c_m_F_mcd(nrow(xydata), ncol(xydata), floor((sum(dim(xydata)) + 1) / 2))
       # c_hat_F <- temp_c_m$c_hat
       # m_hat_F <- temp_c_m$m_hat
@@ -1256,10 +1256,10 @@ compute.bagWhiskerPlot <- function(
         is_outlier <- rep(F, length(mah_dist_sq))
       } else {
         # browser()
-        if (asymp_dist_pv == 'chisq') {
+        if (asymp_dist_pv == "chisq") {
           mah.cutoff <- qchisq(1 - testres$th, df = 2)
-        } else if (asymp_dist_pv == 'F') {
-          F_cut <- stats::qf(testres$th, df1 = ncol(xydata), df2 = m_hat_F-ncol(xydata)+1, lower.tail = FALSE)
+        } else if (asymp_dist_pv == "F") {
+          F_cut <- stats::qf(testres$th, df1 = ncol(xydata), df2 = m_hat_F - ncol(xydata) + 1, lower.tail = FALSE)
           mah.cutoff <- F_cut * (ncol(xydata) * m_hat_F) / (c_hat_F * (m_hat_F - ncol(xydata) + 1))
         }
         is_outlier <- mah_dist_sq > (mah.cutoff - 1e-8)
@@ -1275,10 +1275,10 @@ compute.bagWhiskerPlot <- function(
         hull.loop <- non_outliers[hull_indices, ]
       } else {
         # browser()
-        if (asymp_dist_pv == 'chisq') {
+        if (asymp_dist_pv == "chisq") {
           mah.cutoff <- qchisq(1 - testres$th, df = 2)
-        } else if (asymp_dist_pv == 'F') {
-          F_cut <- stats::qf(testres$th, df1 = ncol(xydata), df2 = m_hat_F-ncol(xydata)+1, lower.tail = FALSE)
+        } else if (asymp_dist_pv == "F") {
+          F_cut <- stats::qf(testres$th, df1 = ncol(xydata), df2 = m_hat_F - ncol(xydata) + 1, lower.tail = FALSE)
           mah.cutoff <- F_cut * (ncol(xydata) * m_hat_F) / (c_hat_F * (m_hat_F - ncol(xydata) + 1))
         }
         mult_factor <- sqrt(mah.cutoff / median(mah_dist_sq))
@@ -1336,12 +1336,12 @@ compute.bagWhiskerPlot <- function(
   # mah_dist_sq <- mahalanobis(xydata, center = estcov$center, cov = estcov$cov)
   mah_dist_sq <- mahalanobis(xydata, center = center, cov = estcov$cov)
 
-  if(asymp_dist_pv == 'chisq') {
+  if (asymp_dist_pv == "chisq") {
     p_values <- pchisq(mah_dist_sq, df = 2, lower.tail = FALSE)
-  } else if (asymp_dist_pv == 'F') {
+  } else if (asymp_dist_pv == "F") {
     s_diag_F <- diag(estcov$cov)
     c_hat_F <- mean(s_diag_F)
-    m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F)) ^ 2)
+    m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F))^2)
     # temp_c_m <- .est_c_m_F_mcd(nrow(xydata), ncol(xydata), floor((sum(dim(xydata)) + 1) / 2))
     # c_hat_F <- temp_c_m$c_hat
     # m_hat_F <- temp_c_m$m_hat
@@ -1354,10 +1354,10 @@ compute.bagWhiskerPlot <- function(
     mt_method <- type1
     mt_res <- .bp_multi_test_adj_threshold(p_values, method = mt_method, alpha = q)
     # browser()
-    if (asymp_dist_pv == 'chisq') {
+    if (asymp_dist_pv == "chisq") {
       d2_adj <- stats::qchisq(p = 1 - mt_res$th, df = 2)
-    } else if (asymp_dist_pv == 'F') {
-      F_cut <- stats::qf(mt_res$th, df1 = ncol(xydata), df2 = m_hat_F-ncol(xydata)+1, lower.tail = FALSE)
+    } else if (asymp_dist_pv == "F") {
+      F_cut <- stats::qf(mt_res$th, df1 = ncol(xydata), df2 = m_hat_F - ncol(xydata) + 1, lower.tail = FALSE)
       d2_adj <- F_cut * (ncol(xydata) * m_hat_F) / (c_hat_F * (m_hat_F - ncol(xydata) + 1))
     }
     median_d2 <- stats::median(mah_dist_sq)
@@ -1445,7 +1445,7 @@ compute.bagWhiskerPlot <- function(
     fence_mag_bag <- cbind(tmp[, 1] + center[1], tmp[, 2] + center[2])
   }
 
-  
+
 
   # Identify which original data points lie outside the magnified fence of the bag
   # This will be used downstream (e.g., for plotting) to emphasize those points.
@@ -1581,22 +1581,22 @@ find.hdepths.tp <- function(tp, data, number.of.directions = 181) { # 121130
 }
 
 .est_c_m_F_mcd <- function(n, p, h) {
-  chisq_cutoff = qchisq(h / n, df = p)
-  c_hat = pchisq(chisq_cutoff, df = p + 2) / (h / n)
+  chisq_cutoff <- qchisq(h / n, df = p)
+  c_hat <- pchisq(chisq_cutoff, df = p + 2) / (h / n)
 
-  h = floor((n + p + 1) / 2)
-  a = (n - h) / n
-  q_a = qchisq(1 - a, df = p)
-  c_a = (1 - a) / pchisq(q_a, df = p + 2)
-  c_2 = -pchisq(q_a, df = p + 2) / 2
-  c_3 = -pchisq(q_a, df = p + 4) / 2
-  c_4 = 3 * c_3
-  b_1 = c_a * (c_3 - c_4) / (1 - a)
-  b_2 = 0.5 + c_a / (1 - a) * (c_3 - q_a / p * (c_2 + (1 - a) / 2))
-  v_1 = (1 - a) * b_1^2 * (a * (c_a * q_a / p - 1)^2 - 1) - 2 * c_3 * c_a^2 * (3 * (b_1 - p * b_2)^2 + (p + 2) * b_2 * (2 * b_1 - p * b_2))
-  v_2 = n * (b_1 * (b_1 - p * b_2) * (1 - a))^2 * c_a^2
-  v = v_1 / v_2
-  m_hat = 2 / v / c_a^2
+  h <- floor((n + p + 1) / 2)
+  a <- (n - h) / n
+  q_a <- qchisq(1 - a, df = p)
+  c_a <- (1 - a) / pchisq(q_a, df = p + 2)
+  c_2 <- -pchisq(q_a, df = p + 2) / 2
+  c_3 <- -pchisq(q_a, df = p + 4) / 2
+  c_4 <- 3 * c_3
+  b_1 <- c_a * (c_3 - c_4) / (1 - a)
+  b_2 <- 0.5 + c_a / (1 - a) * (c_3 - q_a / p * (c_2 + (1 - a) / 2))
+  v_1 <- (1 - a) * b_1^2 * (a * (c_a * q_a / p - 1)^2 - 1) - 2 * c_3 * c_a^2 * (3 * (b_1 - p * b_2)^2 + (p + 2) * b_2 * (2 * b_1 - p * b_2))
+  v_2 <- n * (b_1 * (b_1 - p * b_2) * (1 - a))^2 * c_a^2
+  v <- v_1 / v_2
+  m_hat <- 2 / v / c_a^2
 
-  return (list(c_hat = c_hat, m_hat = m_hat))
+  return(list(c_hat = c_hat, m_hat = m_hat))
 }
