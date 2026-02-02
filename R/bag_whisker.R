@@ -13,28 +13,70 @@
 #'   the multiple-testing step. One of `"unadjusted"`, `"FWER"`, `"FDR"`,
 #'   or `"PFER"`.
 #' @param q Numeric, the control level for the multiple testing procedure.
-#' @param factor Numeric, the factor lambda for `"unadjusted"``.
-#' @param redefine_loop Logical; if `TRUE`, the loop (outer hull) may be
-#'   recomputed after multiple-testing.
+#' @param normal_inlier Logical; if `TRUE`, the inner fence is based on a
+#'   normal reference distribution instead of a depth-based bag.
+#' @param normal_outter Logical; if `TRUE`, the outer fence is based on a
+#'   normal reference distribution, otherwise it is defined as a multiple of
+#'   the inner bag.
+#' @param conservative_lambda Numeric; additional inflation factor for the
+#'   outer fence when using multiple-testing based calibration.
 #' @param asymp_dist_pv Character string; asymptotic distribution used for
 #'   p-value calculation, default `"chisq"`.
 #' @param center_type Character string; center definition, default `"hdepth"`.
+#' @param redefine_loop Logical; if `TRUE`, the loop (outer hull) may be
+#'   recomputed after multiple-testing.
+#' @param factor Numeric; the factor lambda for `"unadjusted"` that controls
+#'   how far the bag is expanded to obtain the loop.
 #' @param na.rm Logical; if `TRUE`, rows with missing values are removed,
 #'   otherwise medians are used to impute.
 #' @param approx.limit Integer; threshold above which a subsample is used for
 #'   approximating the bag-plot computation.
 #' @param dkmethod Integer in `1:2`; depth kernel method, with `1` recommended.
 #' @param precision Numeric; controls precision of hull expansion.
-#' @param show Logical; if `TRUE` (default), a plot is produced via
-#'   [plot.bagWhiskerPlot()]. If `FALSE`, only the computed object is
-#'   returned.
-#' @param ... Passed on to [plot.bagWhiskerPlot()] when `show = TRUE`.
+#' @param verbose Logical; if `TRUE`, progress messages from the computational
+#'   engine are printed.
+#' @param debug.plots Character string; controls generation of additional
+#'   diagnostic plots for debugging.
+#' @param show.outlier Logical; if `TRUE`, identified outliers are shown in
+#'   the plot.
+#' @param show.whiskers Logical; if `TRUE`, whisker segments are added to the
+#'   plot.
+#' @param show.looppoints Logical; if `TRUE`, data points classified as
+#'   belonging to the loop are shown.
+#' @param show.bagpoints Logical; if `TRUE`, data points classified as inside
+#'   the bag are shown.
+#' @param show.loophull Logical; if `TRUE`, the convex hull of the loop is
+#'   drawn.
+#' @param show.baghull Logical; if `TRUE`, the convex hull of the bag is
+#'   drawn.
+#' @param create.plot Logical; if `TRUE` (default), a plot is created for the
+#'   computed bag-and-whisker representation.
+#' @param add Logical; if `TRUE`, graphical elements are added to the current
+#'   plot; otherwise a new plot is started.
+#' @param pch,cex Graphical parameters forwarded to the plotting method to
+#'   control point character and expansion.
+#' @param transparency Logical; if `TRUE`, semi-transparent fills are used for
+#'   the bag and loop hulls.
+#' @param col.loophull Fill colour used for the
+#'   loop hull.
+#' @param col.looppoints Point colour used for the
+#'   loop points.
+#' @param col.baghull Fill colour used for the bag
+#'   hull.
+#' @param col.bagpoints Point colour used for the bag
+#'   points.
+#' @param show.center Logical; if `TRUE`, the chosen center of the data is
+#'   highlighted in the plot.
+#' @param show.fence_mag_bag Logical; if `TRUE`, the fence magnitude relative
+#'   to the bag is visualised.
+#' @param ... Passed on to the S3 method [plot.bagWhiskerPlot()] when
+#'   `create.plot = TRUE`.
 #'
 #' @details
 #' This function is the only exported user-facing entry point of the
 #' package. It calls the internal computational engine
-#' [compute.bagWhiskerPlot()] and then, by default, plots the resulting
-#' object using a ggplot2-based implementation of
+#' `compute.bagWhiskerPlot()` and then, by default, plots the resulting
+#' object using a ggplot2-based implementation of the S3 method
 #' [plot.bagWhiskerPlot()].
 #'
 #' @return

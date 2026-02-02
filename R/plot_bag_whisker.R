@@ -247,7 +247,21 @@ if (getRversion() >= "2.15.1") {
   !inside
 }
 
-# Build layers only (for advanced composition)
+#' Build ggplot2 layers for a bag-whisker plot
+#'
+#' @description
+#' Low-level helper that converts a \code{bagWhiskerPlot} object (as
+#' produced by [bag_whisker()] or \code{compute.bagWhiskerPlot()}) into a
+#' list of \pkg{ggplot2} layers. This is mainly intended for advanced
+#' composition; typical users should call [plot.bagWhiskerPlot()] via
+#' [bag_whisker()].
+#'
+#' @param x A \code{bagWhiskerPlot} object.
+#' @inheritParams plot.bagWhiskerPlot
+#'
+#' @return A list of \pkg{ggplot2} layers.
+#'
+#' @keywords internal
 bp_build_layers <- function(
     x,
     show.outlier = TRUE,
@@ -560,9 +574,73 @@ bp_build_layers <- function(
   c(whisker_layers, layers)
 }
 
-# -----------------------------
-# ggplot2-based plot.bagWhiskerPlot
-# -----------------------------
+#' Plot a bag-whisker plot using ggplot2
+#'
+#' Produce a bag–whisker plot from a \code{bagWhiskerPlot}
+#' object using \pkg{ggplot2}. The function builds the graphical layers with
+#' \code{\link{bp_build_layers}} and either prints a new \code{ggplot} object
+#' or adds the layers to an existing plot.
+#'
+#' @param x A \code{bagWhiskerPlot} object as returned by
+#'   \code{\link{bag_whisker}} (or related constructors).
+#' @param show.outlier Logical; should outlying points be drawn?
+#' @param show.whiskers Logical; should whisker segments from outer points
+#'   towards the bag (or center) be drawn?
+#' @param show.looppoints Logical; draw the points in the loop region
+#'   (non-outlying outer points)?
+#' @param show.bagpoints Logical; draw the points inside the bag?
+#' @param show.loophull Logical; draw the polygonal hull of the loop region?
+#' @param show.baghull Logical; draw the polygonal hull of the bag region?
+#' @param show.fence_mag_bag Logical; draw the data-adaptive magnified fence
+#'   derived from multiple-testing thresholds?
+#' @param add Logical; if \code{TRUE}, the layers are added to an existing
+#'   \code{ggplot} object supplied via \code{...} (see Details). If
+#'   \code{FALSE}, a new plot is created and printed.
+#' @param pch Plotting character (shape) used for points.
+#' @param cex Numeric scaling factor for point sizes and (in 2D) whisker line
+#'   width.
+#' @param verbose Logical; currently unused, reserved for possible diagnostic
+#'   messages.
+#' @param col.loophull Fill color for the loop hull polygon.
+#' @param col.looppoints Color for loop-region points.
+#' @param col.baghull Fill color for the bag hull polygon.
+#' @param col.bagpoints Color for bag-region points.
+#' @param col.fence_mag_bag Color for the magnified fence polygon.
+#' @param transparency Logical; if \code{TRUE}, semi-transparent versions of
+#'   the hull colors are used.
+#' @param show.center Logical; draw the center point of the bag-whisker plot.
+#' @param whisker.fade Logical; if \code{TRUE}, whisker segments are drawn as
+#'   multiple short segments with fading alpha towards their ends.
+#' @param whisker.n Integer; number of subsegments used per whisker when
+#'   \code{whisker.fade = TRUE}.
+#' @param whisker.alpha.start Numeric in \code{[0, 1]} giving the starting
+#'   alpha for faded whiskers (near the outer point).
+#' @param whisker.alpha.end Numeric in \code{[0, 1]} giving the ending alpha
+#'   for faded whiskers (near the bag or center).
+#' @param whisker.end.prop Numeric in \code{[0, 1]} controlling how far along
+#'   the whisker the fade is applied; values close to 1 fade along most of
+#'   the whisker.
+#' @param main Optional main title for the plot.
+#' @param ... Additional arguments passed on to the underlying \pkg{ggplot2}
+#'   scales or base plot. In particular, \code{xlim} and \code{ylim} can be
+#'   supplied to control axis limits. When \code{add = TRUE}, \code{gg} or
+#'   \code{base_gg} can be supplied as an existing \code{ggplot} object to
+#'   which the layers are added.
+#'
+#' @details
+#' The function is a \code{plot} method for \code{bagWhiskerPlot} objects and
+#' relies on \pkg{ggplot2} for rendering. 
+#' 
+#' @return A \code{\link[ggplot2:ggplot]{ggplot}} object representing the
+#'   bag-whisker plot, returned invisibly. The plot is drawn as a side effect
+#'   when \code{add = FALSE} or when \code{add = TRUE} with an existing
+#'   \code{ggplot} object.
+#'
+#' @seealso \code{\link{bag_whisker}}, \code{\link{bp_build_layers}},
+#'   \pkg{ggplot2}
+#'
+#' @method plot bagWhiskerPlot
+#' @export
 plot.bagWhiskerPlot <- function(
     x,
     show.outlier = TRUE,
