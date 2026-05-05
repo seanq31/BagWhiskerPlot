@@ -2,7 +2,8 @@
 % Please edit documentation in R/bag_whisker.R
 \name{bag_whisker}
 \alias{bag_whisker}
-\title{Bag-Whisker Plot with Multiple-Testing Based Outlier Control}
+\title{Bag-and-whisker plot implementation, with outlier detection
+under different type-I error controls}
 \usage{
 bag_whisker(
   x,
@@ -139,10 +140,10 @@ decomposition and outlier information. When \code{show = TRUE}, the object
 is returned invisibly after drawing the plot.
 }
 \description{
-Compute a bag-plot based representation of bivariate data and draw
-whisker-like segments that highlight outliers under different type-I
-error controls. This is a thin user-facing wrapper around the internal
-computation and ggplot2-based plotting helpers in this package.
+Compute and draw a bag-and-whisker plot of bivariate data that
+highlights outliers under different type-I error controls. This is
+a thin user-facing wrapper around the internal computation and
+ggplot2-based plotting helpers in this package.
 }
 \details{
 This function is the only exported user-facing entry point of the

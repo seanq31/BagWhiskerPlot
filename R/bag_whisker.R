@@ -1,10 +1,11 @@
-#' Bag-Whisker Plot with Multiple-Testing Based Outlier Control
+#' Bag-and-whisker plot implementation, with outlier detection 
+#' under different type-I error controls
 #'
 #' @description
-#' Compute a bag-plot based representation of bivariate data and draw
-#' whisker-like segments that highlight outliers under different type-I
-#' error controls. This is a thin user-facing wrapper around the internal
-#' computation and ggplot2-based plotting helpers in this package.
+#' Compute and draw a bag-and-whisker plot of bivariate data that
+#' highlights outliers under different type-I error controls. This is
+#' a thin user-facing wrapper around the internal computation and
+#' ggplot2-based plotting helpers in this package.
 #'
 #' @param x,y Numeric vectors giving the coordinates of the bivariate sample.
 #'   You can either supply both `x` and `y`, or a two-column matrix / data
