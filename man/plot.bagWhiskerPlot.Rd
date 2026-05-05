@@ -10,7 +10,7 @@
   show.whiskers = TRUE,
   show.looppoints = TRUE,
   show.bagpoints = TRUE,
-  show.loophull = TRUE,
+  show.loophull = FALSE,
   show.baghull = TRUE,
   show.fence_mag_bag = TRUE,
   add = FALSE,
@@ -37,25 +37,29 @@
 \item{x}{A \code{bagWhiskerPlot} object as returned by
 \code{\link{bag_whisker}} (or related constructors).}
 
-\item{show.outlier}{Logical; should outlying points be drawn?}
+\item{show.outlier}{Logical; if \code{TRUE}, identified outliers are shown
+in the plot.}
 
-\item{show.whiskers}{Logical; should whisker segments from outer points
-towards the bag (or center) be drawn?}
+\item{show.whiskers}{Logical; if \code{TRUE}, whisker segments are added to
+the plot.}
 
-\item{show.looppoints}{Logical; draw the points in the loop region
-(non-outlying outer points)?}
+\item{show.looppoints}{Logical; if \code{TRUE}, data points classified as
+belonging to the loop are shown.}
 
-\item{show.bagpoints}{Logical; draw the points inside the bag?}
+\item{show.bagpoints}{Logical; if \code{TRUE}, data points classified as
+inside the bag are shown.}
 
-\item{show.loophull}{Logical; draw the polygonal hull of the loop region?}
+\item{show.loophull}{Logical; if \code{TRUE}, the convex hull of the loop is
+drawn.}
 
-\item{show.baghull}{Logical; draw the polygonal hull of the bag region?}
+\item{show.baghull}{Logical; if \code{TRUE}, the convex hull of the bag is
+drawn.}
 
-\item{show.fence_mag_bag}{Logical; draw the data-adaptive magnified fence
-derived from multiple-testing thresholds?}
+\item{show.fence_mag_bag}{Logical; if \code{TRUE}, the fence obtained by
+magnifying the bag (data-adaptive threshold) is visualised.}
 
-\item{add}{Logical; if \code{TRUE}, the layers are added to an existing
-\code{ggplot} object supplied via \code{...} (see Details). If
+\item{add}{Logical; if \code{TRUE}, graphical elements are added to an
+existing \code{ggplot} object supplied via \code{...} (see Details). If
 \code{FALSE}, a new plot is created and printed.}
 
 \item{pch}{Plotting character (shape) used for points.}
@@ -79,7 +83,8 @@ messages.}
 \item{transparency}{Logical; if \code{TRUE}, semi-transparent versions of
 the hull colors are used.}
 
-\item{show.center}{Logical; draw the center point of the bag-whisker plot.}
+\item{show.center}{Logical; if \code{TRUE}, the chosen center of the data is
+highlighted in the plot.}
 
 \item{whisker.fade}{Logical; if \code{TRUE}, whisker segments are drawn as
 multiple short segments with fading alpha towards their ends.}
@@ -112,10 +117,10 @@ when \code{add = FALSE} or when \code{add = TRUE} with an existing
 \code{ggplot} object.
 }
 \description{
-Produce a bag–whisker plot from a \code{bagWhiskerPlot}
-object using \pkg{ggplot2}. The function builds the graphical layers with
-\code{\link{bp_build_layers}} and either prints a new \code{ggplot} object
-or adds the layers to an existing plot.
+Produce a bag-whisker plot from a \code{bagWhiskerPlot} object using
+\pkg{ggplot2}. This is the plotting backend used by \code{bag_whisker()} to
+render the bag, loop, fence, and whisker elements, with optional highlights for
+outliers and the center.
 }
 \details{
 The function is a \code{plot} method for \code{bagWhiskerPlot} objects and

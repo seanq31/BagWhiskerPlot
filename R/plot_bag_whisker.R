@@ -268,7 +268,7 @@ bp_build_layers <- function(
     show.whiskers = TRUE,
     show.looppoints = TRUE,
     show.bagpoints = TRUE,
-    show.loophull = TRUE,
+    show.loophull = FALSE,
     show.baghull = TRUE,
     show.fence_mag_bag = TRUE,
     pch = 16, cex = .4,
@@ -576,25 +576,29 @@ bp_build_layers <- function(
 
 #' Plot a bag-whisker plot using ggplot2
 #'
-#' Produce a bag–whisker plot from a \code{bagWhiskerPlot}
-#' object using \pkg{ggplot2}. The function builds the graphical layers with
-#' \code{\link{bp_build_layers}} and either prints a new \code{ggplot} object
-#' or adds the layers to an existing plot.
+#' Produce a bag-whisker plot from a \code{bagWhiskerPlot} object using
+#' \pkg{ggplot2}. This is the plotting backend used by \code{bag_whisker()} to
+#' render the bag, loop, fence, and whisker elements, with optional highlights for
+#' outliers and the center.
 #'
 #' @param x A \code{bagWhiskerPlot} object as returned by
 #'   \code{\link{bag_whisker}} (or related constructors).
-#' @param show.outlier Logical; should outlying points be drawn?
-#' @param show.whiskers Logical; should whisker segments from outer points
-#'   towards the bag (or center) be drawn?
-#' @param show.looppoints Logical; draw the points in the loop region
-#'   (non-outlying outer points)?
-#' @param show.bagpoints Logical; draw the points inside the bag?
-#' @param show.loophull Logical; draw the polygonal hull of the loop region?
-#' @param show.baghull Logical; draw the polygonal hull of the bag region?
-#' @param show.fence_mag_bag Logical; draw the data-adaptive magnified fence
-#'   derived from multiple-testing thresholds?
-#' @param add Logical; if \code{TRUE}, the layers are added to an existing
-#'   \code{ggplot} object supplied via \code{...} (see Details). If
+#' @param show.outlier Logical; if \code{TRUE}, identified outliers are shown
+#'   in the plot.
+#' @param show.whiskers Logical; if \code{TRUE}, whisker segments are added to
+#'   the plot.
+#' @param show.looppoints Logical; if \code{TRUE}, data points classified as
+#'   belonging to the loop are shown.
+#' @param show.bagpoints Logical; if \code{TRUE}, data points classified as
+#'   inside the bag are shown.
+#' @param show.loophull Logical; if \code{TRUE}, the convex hull of the loop is
+#'   drawn.
+#' @param show.baghull Logical; if \code{TRUE}, the convex hull of the bag is
+#'   drawn.
+#' @param show.fence_mag_bag Logical; if \code{TRUE}, the fence obtained by
+#'   magnifying the bag (data-adaptive threshold) is visualised.
+#' @param add Logical; if \code{TRUE}, graphical elements are added to an
+#'   existing \code{ggplot} object supplied via \code{...} (see Details). If
 #'   \code{FALSE}, a new plot is created and printed.
 #' @param pch Plotting character (shape) used for points.
 #' @param cex Numeric scaling factor for point sizes and (in 2D) whisker line
@@ -608,7 +612,8 @@ bp_build_layers <- function(
 #' @param col.fence_mag_bag Color for the magnified fence polygon.
 #' @param transparency Logical; if \code{TRUE}, semi-transparent versions of
 #'   the hull colors are used.
-#' @param show.center Logical; draw the center point of the bag-whisker plot.
+#' @param show.center Logical; if \code{TRUE}, the chosen center of the data is
+#'   highlighted in the plot.
 #' @param whisker.fade Logical; if \code{TRUE}, whisker segments are drawn as
 #'   multiple short segments with fading alpha towards their ends.
 #' @param whisker.n Integer; number of subsegments used per whisker when
@@ -647,7 +652,7 @@ plot.bagWhiskerPlot <- function(
     show.whiskers = TRUE,
     show.looppoints = TRUE,
     show.bagpoints = TRUE,
-    show.loophull = TRUE,
+    show.loophull = FALSE,
     show.baghull = TRUE,
     show.fence_mag_bag = TRUE,
     add = FALSE,

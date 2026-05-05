@@ -4,8 +4,6 @@ compute.bagWhiskerPlot <- function(
     q = 0.1, # The control level for type 1 error
     normal_inlier = F,
     normal_outter = F,
-    conservative_lambda = 0,
-    redefine_loop = FALSE,
     asymp_dist_pv = "chisq",
     center_type = "hdepth",
     na.rm = FALSE, # should NAs removed or exchanged
@@ -1399,9 +1397,7 @@ compute.bagWhiskerPlot <- function(
   # }
 
   if (!normal_inlier && type1 %in% c("FWER", "FDR", "PFER")) {
-    # recompute lambda_mag_bag
-    if (conservative_lambda == 1) {
-      # Case 1: Smallest lambda so that all non-rejected (inliers by MT) are included
+    # recompute lambda_mag_bag to be the smallest lambda so that all non-rejected (inliers by MT) are included
       if (!is.null(hull.bag) && length(hull.bag) > 0 && length(mt_res$de) == nrow(xydata)) {
         idx_in <- !mt_res$de
         if (sum(idx_in) > 0) {
@@ -1417,25 +1413,7 @@ compute.bagWhiskerPlot <- function(
           print(paste("Factor lambda: ", signif(lambda_mag_bag, 6)))
         }
       }
-    } else if (conservative_lambda == 2) {
-      # Case 2: Largest lambda so that all rejected (outliers by MT) are excluded
-      if (!is.null(hull.bag) && length(hull.bag) > 0 && length(mt_res$de) == nrow(xydata)) {
-        idx_out <- mt_res$de
-        if (sum(idx_out) > 0) {
-          z <- xydata[as.logical(idx_out), , drop = FALSE]
-          cut_pts <- find.cut.z.pg(z, hull.bag, center = center)
-          center_mat <- matrix(center, nrow = nrow(z), ncol = 2, byrow = TRUE)
-          num <- sqrt(rowSums((z - center_mat)^2))
-          den <- sqrt(rowSums((cut_pts - center_mat)^2))
-          ratio <- ifelse(num == 0, 0, num / den)
-          lambda_upper <- min(ratio)
-          lambda_mag_bag <- max(0, lambda_upper)
-          print(paste("Factor lambda: ", signif(lambda_mag_bag, 6)))
-        } else {
-          print("No outliers detected; skipping conservative lambda_mag_bag (case 2) recomputation.")
-        }
-      }
-    }
+    
   }
 
   fence_mag_bag <- NULL
@@ -1461,7 +1439,7 @@ compute.bagWhiskerPlot <- function(
     outside_fence_mag_bag_idx <- integer(0)
   }
 
-  if (!is.null(fence_mag_bag) && redefine_loop) {
+  if (!is.null(fence_mag_bag)) {
     inside_mask <- !out.of.polygon(xydata, fence_mag_bag)
     inside_pts <- xydata[inside_mask, , drop = FALSE]
     hull.loop <- inside_pts[chull(inside_pts[, 1], inside_pts[, 2]), , drop = FALSE]

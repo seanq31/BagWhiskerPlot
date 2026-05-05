@@ -10,7 +10,7 @@ bp_build_layers(
   show.whiskers = TRUE,
   show.looppoints = TRUE,
   show.bagpoints = TRUE,
-  show.loophull = TRUE,
+  show.loophull = FALSE,
   show.baghull = TRUE,
   show.fence_mag_bag = TRUE,
   pch = 16,
@@ -32,22 +32,26 @@ bp_build_layers(
 \arguments{
 \item{x}{A \code{bagWhiskerPlot} object.}
 
-\item{show.outlier}{Logical; should outlying points be drawn?}
+\item{show.outlier}{Logical; if \code{TRUE}, identified outliers are shown
+in the plot.}
 
-\item{show.whiskers}{Logical; should whisker segments from outer points
-towards the bag (or center) be drawn?}
+\item{show.whiskers}{Logical; if \code{TRUE}, whisker segments are added to
+the plot.}
 
-\item{show.looppoints}{Logical; draw the points in the loop region
-(non-outlying outer points)?}
+\item{show.looppoints}{Logical; if \code{TRUE}, data points classified as
+belonging to the loop are shown.}
 
-\item{show.bagpoints}{Logical; draw the points inside the bag?}
+\item{show.bagpoints}{Logical; if \code{TRUE}, data points classified as
+inside the bag are shown.}
 
-\item{show.loophull}{Logical; draw the polygonal hull of the loop region?}
+\item{show.loophull}{Logical; if \code{TRUE}, the convex hull of the loop is
+drawn.}
 
-\item{show.baghull}{Logical; draw the polygonal hull of the bag region?}
+\item{show.baghull}{Logical; if \code{TRUE}, the convex hull of the bag is
+drawn.}
 
-\item{show.fence_mag_bag}{Logical; draw the data-adaptive magnified fence
-derived from multiple-testing thresholds?}
+\item{show.fence_mag_bag}{Logical; if \code{TRUE}, the fence obtained by
+magnifying the bag (data-adaptive threshold) is visualised.}
 
 \item{pch}{Plotting character (shape) used for points.}
 
@@ -67,7 +71,8 @@ width.}
 \item{transparency}{Logical; if \code{TRUE}, semi-transparent versions of
 the hull colors are used.}
 
-\item{show.center}{Logical; draw the center point of the bag-whisker plot.}
+\item{show.center}{Logical; if \code{TRUE}, the chosen center of the data is
+highlighted in the plot.}
 
 \item{whisker.fade}{Logical; if \code{TRUE}, whisker segments are drawn as
 multiple short segments with fading alpha towards their ends.}

@@ -11,10 +11,8 @@ bag_whisker(
   q = 0.1,
   normal_inlier = FALSE,
   normal_outter = FALSE,
-  conservative_lambda = 0,
   asymp_dist_pv = "chisq",
   center_type = "hdepth",
-  redefine_loop = TRUE,
   factor = 3,
   na.rm = FALSE,
   approx.limit = 300,
@@ -49,73 +47,67 @@ frame via \code{x} and leave \code{y} missing.}
 
 \item{type1}{Character string specifying the type-I error control used in
 the multiple-testing step. One of \code{"unadjusted"}, \code{"FWER"}, \code{"FDR"},
-or \code{"PFER"}.}
+or \code{"PFER"}, default \code{"unadjusted"}.}
 
-\item{q}{Numeric, the control level for the multiple testing procedure.}
+\item{q}{Numeric, the control level for the multiple testing procedure, default \code{0.1}.}
 
-\item{normal_inlier}{Logical; if \code{TRUE}, the inner fence is based on a
-normal reference distribution instead of a depth-based bag.}
+\item{normal_inlier}{Logical; if \code{TRUE}, the bag is calculated based on a
+normal reference distribution instead of a depth-based bag, default \code{FALSE}.}
 
-\item{normal_outter}{Logical; if \code{TRUE}, the outer fence is based on a
-normal reference distribution, otherwise it is defined as a multiple of
-the inner bag.}
-
-\item{conservative_lambda}{Numeric; additional inflation factor for the
-outer fence when using multiple-testing based calibration.}
+\item{normal_outter}{Logical; if \code{TRUE}, the fence is calculated based on a
+normal reference distribution, otherwise it is obtained by magnifying
+the bag, default \code{FALSE}.}
 
 \item{asymp_dist_pv}{Character string; asymptotic distribution used for
 p-value calculation, default \code{"chisq"}.}
 
 \item{center_type}{Character string; center definition, default \code{"hdepth"}.}
 
-\item{redefine_loop}{Logical; if \code{TRUE}, the loop (outer hull) may be
-recomputed after multiple-testing.}
-
 \item{factor}{Numeric; the factor lambda for \code{"unadjusted"} that controls
-how far the bag is expanded to obtain the loop.}
+how far the bag is magnified to obtain the fence, default \code{3}.}
 
 \item{na.rm}{Logical; if \code{TRUE}, rows with missing values are removed,
-otherwise medians are used to impute.}
+otherwise medians are used to impute, default \code{FALSE}.}
 
 \item{approx.limit}{Integer; threshold above which a subsample is used for
-approximating the bag-plot computation.}
+approximating the bag-plot computation, default \code{300}.}
 
 \item{show.outlier}{Logical; if \code{TRUE}, identified outliers are shown in
-the plot.}
+the plot, default \code{TRUE}.}
 
 \item{show.whiskers}{Logical; if \code{TRUE}, whisker segments are added to the
-plot.}
+plot, default \code{TRUE}.}
 
 \item{show.looppoints}{Logical; if \code{TRUE}, data points classified as
-belonging to the loop are shown.}
+belonging to the loop are shown, default \code{TRUE}.}
 
 \item{show.bagpoints}{Logical; if \code{TRUE}, data points classified as inside
-the bag are shown.}
+the bag are shown, default \code{TRUE}.}
 
 \item{show.loophull}{Logical; if \code{TRUE}, the convex hull of the loop is
-drawn.}
+drawn, default \code{FALSE}.}
 
 \item{show.baghull}{Logical; if \code{TRUE}, the convex hull of the bag is
-drawn.}
+drawn, default \code{TRUE}.}
 
-\item{create.plot}{Logical; if \code{TRUE} (default), a plot is created for the
-computed bag-and-whisker representation.}
+\item{create.plot}{Logical; if \code{TRUE}, a plot is created for the
+computed bag-and-whisker representation, default \code{TRUE}.}
 
 \item{add}{Logical; if \code{TRUE}, graphical elements are added to the current
-plot; otherwise a new plot is started.}
+plot; otherwise a new plot is started, default \code{FALSE}.}
 
 \item{pch, cex}{Graphical parameters forwarded to the plotting method to
 control point character and expansion.}
 
-\item{dkmethod}{Integer in \code{1:2}; depth kernel method, with \code{1} recommended.}
+\item{dkmethod}{Integer in \code{1:2}; depth kernel method, default \code{1}.}
 
-\item{precision}{Numeric; controls precision of hull expansion.}
+\item{precision}{Numeric; controls precision of hull expansion, default \code{1}.}
 
 \item{verbose}{Logical; if \code{TRUE}, progress messages from the computational
-engine are printed.}
+engine are printed, default \code{FALSE}.}
 
 \item{debug.plots}{Character string; controls generation of additional
-diagnostic plots for debugging.}
+diagnostic plots for debugging, default \code{no}.}
 
 \item{col.loophull}{Fill colour used for the
 loop hull.}
@@ -130,13 +122,13 @@ hull.}
 points.}
 
 \item{transparency}{Logical; if \code{TRUE}, semi-transparent fills are used for
-the bag and loop hulls.}
+the bag and loop hulls, default \code{FALSE}.}
 
 \item{show.center}{Logical; if \code{TRUE}, the chosen center of the data is
-highlighted in the plot.}
+highlighted in the plot, default \code{TRUE}.}
 
-\item{show.fence_mag_bag}{Logical; if \code{TRUE}, the fence magnitude relative
-to the bag is visualised.}
+\item{show.fence_mag_bag}{Logical; if \code{TRUE}, the fence by magnifying
+the bag is visualised, default \code{TRUE}.}
 
 \item{...}{Passed on to the S3 method \code{\link[=plot.bagWhiskerPlot]{plot.bagWhiskerPlot()}} when
 \code{create.plot = TRUE}.}
