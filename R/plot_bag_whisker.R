@@ -182,6 +182,9 @@ if (getRversion() >= "2.15.1") {
   # Helper: distance of point to segment (for boundary detection)
   point_on_segment <- function(px, py, x1, y1, x2, y2, tol) {
     # Bounding box quick rejection (with tolerance)
+    if (is.na(px) || is.na(py)) {
+      return(FALSE)
+    }
     if (px < min(x1, x2) - tol || px > max(x1, x2) + tol ||
       py < min(y1, y2) - tol || py > max(y1, y2) + tol) {
       return(FALSE)

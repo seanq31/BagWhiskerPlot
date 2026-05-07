@@ -20,7 +20,7 @@ compute.bagWhiskerPlot <- function(
     xy <- matrix(xy, ncol = 2)
     # check trivial case
     # if (1 == nrow(pg)) {
-    if (is.vector(pg) || 1 == nrow(pg)) {
+    if (is.null(pg) || is.vector(pg) || nrow(pg) <= 1) {
       return(xy[, 1] == pg[1] & xy[, 2] == pg[2])
     }
     # store number of points of xy and polygon
@@ -1319,7 +1319,11 @@ compute.bagWhiskerPlot <- function(
     extr <- out.of.polygon(pkt.not.bag, hull.loop)
     pxy.outlier <- pkt.not.bag[extr, , drop = FALSE]
     if (0 == length(pxy.outlier)) pxy.outlier <- NULL
-    pxy.outer <- pkt.not.bag[!extr, , drop = FALSE]
+    if (sum(!extr) > 0) {
+      pxy.outer <- pkt.not.bag[!extr, , drop = FALSE]
+    } else {
+      pxy.outer <- NULL
+    }
   } else {
     pxy.outer <- pxy.outlier <- NULL
   }
@@ -1368,8 +1372,8 @@ compute.bagWhiskerPlot <- function(
     mt_res <- list(th = NA_real_, de = logical(0))
   }
   # browser()
-  if (!is.finite(lambda_mag_bag) || lambda_mag_bag == 0) {
-    print("Warning: lambda_mag_bag is infinite or zero.")
+  if (!is.finite(lambda_mag_bag) || lambda_mag_bag == 0 || sum(mt_res$de) == 0) {
+    print("Warning: lambda_mag_bag is infinite or zero, or no rejections in multiple testing procedure.")
     cut_pts <- find.cut.z.pg(xydata, hull.bag, center = center)
     center_mat <- matrix(center, nrow = nrow(xydata), ncol = 2, byrow = TRUE)
     num <- sqrt(rowSums((xydata - center_mat)^2))
@@ -1408,8 +1412,7 @@ compute.bagWhiskerPlot <- function(
           den <- sqrt(rowSums((cut_pts - center_mat)^2))
           ratio <- ifelse(num == 0, 0, num / den)
           lambda_needed <- max(ratio)
-          # browser()
-          lambda_mag_bag <- max(0, lambda_needed, lambda_mag_bag)
+          lambda_mag_bag <- max(1, lambda_needed, lambda_mag_bag)
           print(paste("Factor lambda: ", signif(lambda_mag_bag, 6)))
         }
       }
@@ -1441,14 +1444,22 @@ compute.bagWhiskerPlot <- function(
 
   if (!is.null(fence_mag_bag)) {
     inside_mask <- !out.of.polygon(xydata, fence_mag_bag)
-    inside_pts <- xydata[inside_mask, , drop = FALSE]
-    hull.loop <- inside_pts[chull(inside_pts[, 1], inside_pts[, 2]), , drop = FALSE]
+    if (sum(inside_mask) == 0) {
+      hull.loop <- NULL
+    } else {
+      inside_pts <- xydata[inside_mask, , drop = FALSE]
+      hull.loop <- inside_pts[chull(inside_pts[, 1], inside_pts[, 2]), , drop = FALSE]
+    }
 
     if (length(pkt.not.bag) > 0) {
       extr2 <- out.of.polygon(pkt.not.bag, hull.loop)
       pxy.outlier <- pkt.not.bag[extr2, , drop = FALSE]
       if (0 == length(pxy.outlier)) pxy.outlier <- NULL
-      pxy.outer <- pkt.not.bag[!extr2, , drop = FALSE]
+      if (sum(!extr2) > 0) {
+        pxy.outer <- pkt.not.bag[!extr2, , drop = FALSE]
+      } else {
+        pxy.outer <- NULL
+      }
     } else {
       pxy.outer <- NULL
       pxy.outlier <- NULL
