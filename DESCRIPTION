@@ -1,7 +1,7 @@
 Package: BagWhiskerPlot
 Type: Package
 Title: Bag-and-Whisker Plot
-Version: 0.1.0
+Version: 0.1.1
 Depends: MASS
 Description: Implementation for the paper 'The Bag-and-Whisker Plot: A New Bagplot for Bivariate Data'. Provides a single user-facing function 'bag_whisker()' that wraps the computation and plotting helpers in this package.
 Encoding: UTF-8

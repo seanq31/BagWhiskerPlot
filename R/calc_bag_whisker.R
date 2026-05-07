@@ -1488,7 +1488,10 @@ compute.bagWhiskerPlot <- function(
     mt_method = mt_method,
     fence_mag_bag = fence_mag_bag,
     outside_fence_mag_bag = outside_fence_mag_bag,
-    outside_fence_mag_bag_idx = outside_fence_mag_bag_idx
+    outside_fence_mag_bag_idx = outside_fence_mag_bag_idx,
+    lambda_data = if (exists("lambda_needed")) lambda_needed else NA_real_,
+    lambda_stat = if (exists("lambda_mag_bag")) lambda_mag_bag else NA_real_,
+    lambda_data_over_stat = if (exists("lambda_needed") && exists("lambda_mag_bag") && is.finite(lambda_mag_bag) && lambda_mag_bag != 0) lambda_needed / lambda_mag_bag else NA_real_
   )
   if (verbose) res <- c(res, list(exp.dk = exp.dk, exp.dk.1 = exp.dk.1, hdepth = hdepth))
   class(res) <- "bagWhiskerPlot"
