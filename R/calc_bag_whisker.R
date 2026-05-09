@@ -1211,35 +1211,25 @@ compute.bagWhiskerPlot <- function(
 
 
   ################################
-
+  estcov <- cov.mcd(xydata)
+  mah_dist_sq <- mahalanobis(xydata, center = center, cov = estcov$cov)
   if (type1 == "unadjusted") {
     hull.loop <- cbind(hull.bag[, 1] - center[1], hull.bag[, 2] - center[2])
     hull.loop <- factor * hull.loop
     hull.loop <- cbind(hull.loop[, 1] + center[1], hull.loop[, 2] + center[2])
   } else {
-    estcov <- cov.mcd(xydata)
-    # print(estcov)
-    # mah_dist_sq <- mahalanobis(xydata, center = estcov$center, cov = estcov$cov)
-    mah_dist_sq <- mahalanobis(xydata, center = center, cov = estcov$cov)
-    # print(mah_dist_sq)
     if (asymp_dist_pv == "chisq") {
       p_values <- pchisq(mah_dist_sq, df = 2, lower.tail = FALSE)
-      # print(p_values)
-      # browser()
     } else if (asymp_dist_pv == "F") {
-      s_diag_F <- diag(estcov$cov)
-      c_hat_F <- mean(s_diag_F)
-      m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F))^2)
+      temp_c_m <- .est_c_m_F_sim(nrow(xydata), ncol(xydata), n_sim = 5e2)
       # temp_c_m <- .est_c_m_F_mcd(nrow(xydata), ncol(xydata), floor((sum(dim(xydata)) + 1) / 2))
-      # c_hat_F <- temp_c_m$c_hat
-      # m_hat_F <- temp_c_m$m_hat
+      c_hat_F <- temp_c_m$c_hat
+      m_hat_F <- temp_c_m$m_hat
       F_stats <- c_hat_F * (m_hat_F - dim(xydata)[2] + 1) / (dim(xydata)[2] * m_hat_F) * mah_dist_sq
       p_values <- pf(F_stats, df1 = dim(xydata)[2], df2 = m_hat_F - dim(xydata)[2] + 1, lower.tail = FALSE)
+    } else {
+      stop("Invalid option for asymp_dist_pv. Choose either 'chisq' or 'F'.")
     }
-    # browser()
-    # par(mfrow = c(1, 2))
-    # hist(p_values, ylim=c(0, 800))
-    # hist(pchisq(mah_dist_sq, df = 2, lower.tail = FALSE), ylim=c(0, 800))
 
     if (type1 == "FWER") {
       testres <- holm.func(p_values, q)
@@ -1281,9 +1271,6 @@ compute.bagWhiskerPlot <- function(
         }
         mult_factor <- sqrt(mah.cutoff / median(mah_dist_sq))
         print(mult_factor)
-        # print(median(mah_dist_sq))
-        # print(max(mah_dist_sq))
-        # is_outlier <- mah_dist_sq > mah.cutoff
         hull.loop <- cbind(hull.bag[, 1] - center[1], hull.bag[, 2] - center[2])
         hull.loop <- mult_factor * hull.loop
         hull.loop <- cbind(hull.loop[, 1] + center[1], hull.loop[, 2] + center[2])
@@ -1333,47 +1320,26 @@ compute.bagWhiskerPlot <- function(
   hull.loop <- hull.loop[chull(hull.loop[, 1], hull.loop[, 2]), ]
   if (verbose) cat("end of computation of loop")
 
-  lambda_mag_bag <- factor
-  estcov <- cov.mcd(xydata)
-  # mah_dist_sq <- mahalanobis(xydata, center = estcov$center, cov = estcov$cov)
-  mah_dist_sq <- mahalanobis(xydata, center = center, cov = estcov$cov)
-
-  if (asymp_dist_pv == "chisq") {
-    p_values <- pchisq(mah_dist_sq, df = 2, lower.tail = FALSE)
-  } else if (asymp_dist_pv == "F") {
-    s_diag_F <- diag(estcov$cov)
-    c_hat_F <- mean(s_diag_F)
-    m_hat_F <- 2 / ((sd(s_diag_F) / mean(s_diag_F))^2)
-    # temp_c_m <- .est_c_m_F_mcd(nrow(xydata), ncol(xydata), floor((sum(dim(xydata)) + 1) / 2))
-    # c_hat_F <- temp_c_m$c_hat
-    # m_hat_F <- temp_c_m$m_hat
-    F_stats <- c_hat_F * (m_hat_F - dim(xydata)[2] + 1) / (dim(xydata)[2] * m_hat_F) * mah_dist_sq
-    p_values <- pf(F_stats, df1 = dim(xydata)[2], df2 = m_hat_F - dim(xydata)[2] + 1, lower.tail = FALSE)
-  } else {
-    stop("Invalid option for asymp_dist_pv. Choose 'chisq' or 'f'.")
-  }
+  lambda_stat <- factor
   if (type1 %in% c("FWER", "FDR", "PFER")) {
-    mt_method <- type1
-    mt_res <- .bp_multi_test_adj_threshold(p_values, method = mt_method, alpha = q)
-    # browser()
     if (asymp_dist_pv == "chisq") {
-      d2_adj <- stats::qchisq(p = 1 - mt_res$th, df = 2)
+      d2_adj <- stats::qchisq(p = 1 - testres$th, df = 2)
     } else if (asymp_dist_pv == "F") {
-      F_cut <- stats::qf(mt_res$th, df1 = ncol(xydata), df2 = m_hat_F - ncol(xydata) + 1, lower.tail = FALSE)
+      F_cut <- stats::qf(testres$th, df1 = ncol(xydata), df2 = m_hat_F - ncol(xydata) + 1, lower.tail = FALSE)
       d2_adj <- F_cut * (ncol(xydata) * m_hat_F) / (c_hat_F * (m_hat_F - ncol(xydata) + 1))
     }
     median_d2 <- stats::median(mah_dist_sq)
-    lambda_mag_bag <- sqrt(d2_adj / median_d2)
+    lambda_stat <- sqrt(d2_adj / median_d2)
     # browser()
   } else {
-    lambda_mag_bag <- factor
-    print("Warning: lambda_mag_bag set to factor value in unadjusted method")
+    lambda_stat <- factor
+    print("Warning: lambda_stat set to factor value in unadjusted method")
     mt_method <- d2_adj <- median_d2 <- p_values <- NA_real_
-    mt_res <- list(th = NA_real_, de = logical(0))
+    testres <- list(th = NA_real_, de = logical(0))
   }
   # browser()
-  if (!is.finite(lambda_mag_bag) || lambda_mag_bag == 0 || sum(mt_res$de) == 0) {
-    print("Warning: lambda_mag_bag is infinite or zero, or no rejections in multiple testing procedure.")
+  if (!is.finite(lambda_stat) || lambda_stat == 0 || sum(testres$de) == 0) {
+    print("Warning: lambda_stat is infinite or zero, or no rejections in multiple testing procedure.")
     cut_pts <- find.cut.z.pg(xydata, hull.bag, center = center)
     center_mat <- matrix(center, nrow = nrow(xydata), ncol = 2, byrow = TRUE)
     num <- sqrt(rowSums((xydata - center_mat)^2))
@@ -1382,28 +1348,18 @@ compute.bagWhiskerPlot <- function(
     cand <- cand[!is.nan(cand)]
     max_ratio <- max(cand)
     if (!is.finite(max_ratio) || is.na(max_ratio)) {
-      lambda_mag_bag <- factor
-      print("Warning: failed to recompute lambda_mag_bag; set to factor.")
+      lambda_stat <- factor
+      print("Warning: failed to recompute lambda_stat; set to factor.")
     } else {
-      lambda_mag_bag <- max_ratio
-      print(paste("lambda_mag_bag recomputed to contain all data points:", signif(lambda_mag_bag, 6)))
+      lambda_stat <- max_ratio
+      print(paste("lambda_stat recomputed to contain all data points:", signif(lambda_stat, 6)))
     }
   }
-  # browser()
-  # if (!is.finite(lambda_mag_bag)) {
-  #   lambda_mag_bag <- factor
-  #   print(paste("Warning: lambda_mag_bag is infinite. Set to factor value:", factor))
-  # } else if (lambda_mag_bag == 0) {
-  #   lambda_mag_bag <- factor
-  #   print(paste("Warning: lambda_mag_bag is zero. Set to factor value:", factor))
-  # } else {
-  #   print(paste("lambda_mag_bag:", lambda_mag_bag))
-  # }
 
   if (!normal_inlier && type1 %in% c("FWER", "FDR", "PFER")) {
-    # recompute lambda_mag_bag to be the smallest lambda so that all non-rejected (inliers by MT) are included
-      if (!is.null(hull.bag) && length(hull.bag) > 0 && length(mt_res$de) == nrow(xydata)) {
-        idx_in <- !mt_res$de
+    # recompute lambda_stat to be the smallest lambda so that all non-rejected (inliers by MT) are included
+      if (!is.null(hull.bag) && length(hull.bag) > 0 && length(testres$de) == nrow(xydata)) {
+        idx_in <- !testres$de
         if (sum(idx_in) > 0) {
           z <- xydata[as.logical(idx_in), , drop = FALSE]
           cut_pts <- find.cut.z.pg(z, hull.bag, center = center)
@@ -1411,18 +1367,18 @@ compute.bagWhiskerPlot <- function(
           num <- sqrt(rowSums((z - center_mat)^2))
           den <- sqrt(rowSums((cut_pts - center_mat)^2))
           ratio <- ifelse(num == 0, 0, num / den)
-          lambda_needed <- max(ratio)
-          lambda_mag_bag <- max(1, lambda_needed, lambda_mag_bag)
-          print(paste("Factor lambda: ", signif(lambda_mag_bag, 6)))
+          lambda_data <- max(ratio)
+          lambda_stat <- max(1, lambda_data, lambda_stat)
+          print(paste("Factor lambda: ", signif(lambda_stat, 6)))
         }
       }
     
   }
 
   fence_mag_bag <- NULL
-  if (!is.null(hull.bag) && length(hull.bag) > 0 && is.finite(lambda_mag_bag)) {
+  if (!is.null(hull.bag) && length(hull.bag) > 0 && is.finite(lambda_stat)) {
     tmp <- cbind(hull.bag[, 1] - center[1], hull.bag[, 2] - center[2])
-    tmp <- lambda_mag_bag * tmp
+    tmp <- lambda_stat * tmp
     fence_mag_bag <- cbind(tmp[, 1] + center[1], tmp[, 2] + center[2])
   }
 
@@ -1482,16 +1438,16 @@ compute.bagWhiskerPlot <- function(
     # MT details for reference
     p_values = p_values,
     mah_dist_sq = mah_dist_sq,
-    t_adj = mt_res$th,
+    t_adj = testres$th,
     d2_adj = d2_adj,
-    lambda_mag_bag = lambda_mag_bag,
-    mt_method = mt_method,
+    lambda_stat = lambda_stat,
+    mt_method = type1,
     fence_mag_bag = fence_mag_bag,
     outside_fence_mag_bag = outside_fence_mag_bag,
     outside_fence_mag_bag_idx = outside_fence_mag_bag_idx,
-    lambda_data = if (exists("lambda_needed")) lambda_needed else NA_real_,
-    lambda_stat = if (exists("lambda_mag_bag")) lambda_mag_bag else NA_real_,
-    lambda_data_over_stat = if (exists("lambda_needed") && exists("lambda_mag_bag") && is.finite(lambda_mag_bag) && lambda_mag_bag != 0) lambda_needed / lambda_mag_bag else NA_real_
+    lambda_data = if (exists("lambda_data")) lambda_data else NA_real_,
+    lambda_stat = if (exists("lambda_stat")) lambda_stat else NA_real_,
+    lambda_data_over_stat = if (exists("lambda_data") && exists("lambda_stat") && is.finite(lambda_stat) && lambda_stat != 0) lambda_data / lambda_stat else NA_real_
   )
   if (verbose) res <- c(res, list(exp.dk = exp.dk, exp.dk.1 = exp.dk.1, hdepth = hdepth))
   class(res) <- "bagWhiskerPlot"
@@ -1589,6 +1545,43 @@ find.hdepths.tp <- function(tp, data, number.of.directions = 181) { # 121130
   v_2 <- n * (b_1 * (b_1 - p * b_2) * (1 - a))^2 * c_a^2
   v <- v_1 / v_2
   m_hat <- 2 / v / c_a^2
+
+  return(list(c_hat = c_hat, m_hat = m_hat))
+}
+
+.est_c_m_F_sim <- function(n, p, n_sim = 5e2, n_cores = NULL) {
+  n_sim <- as.integer(n_sim[1])
+  if (is.na(n_sim) || n_sim < 1L) {
+    stop("`n_sim` must be a positive integer.")
+  }
+
+  if (is.null(n_cores)) {
+    detected <- parallel::detectCores()
+    if (is.na(detected) || detected < 2L) {
+      n_cores <- 1L
+    } else {
+      n_cores <- max(1L, detected - 1L)
+    }
+  } else {
+    n_cores <- as.integer(n_cores[1])
+    if (is.na(n_cores) || n_cores < 1L) {
+      stop("`n_cores` must be NULL or a positive integer.")
+    }
+  }
+
+  cl <- parallel::makeCluster(n_cores)
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+
+  run_single_sim <- function(iter, n, p) {
+    x <- matrix(stats::rnorm(n * p), nrow = n, ncol = p)
+    mcd_est <- MASS::cov.mcd(x)$cov
+    return(diag(mcd_est))
+  }
+
+  results_list <- parallel::parLapply(cl, seq_len(n_sim), run_single_sim, n = n, p = p)
+  mat_sii <- do.call(rbind, results_list)
+  c_hat <- mean(mat_sii)
+  m_hat <- 2 / ((sd(mat_sii) / mean(mat_sii))^2)
 
   return(list(c_hat = c_hat, m_hat = m_hat))
 }
