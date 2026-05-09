@@ -29,8 +29,10 @@ bag_whisker(
   cex = 0.6,
   dkmethod = 1,
   precision = 1,
+  n_cores = 1,
   verbose = FALSE,
   debug.plots = "no",
+  timing = FALSE,
   col.loophull = "#aaccff",
   col.looppoints = "#3355ff",
   col.baghull = "#D3D3D3",
@@ -104,11 +106,20 @@ control point character and expansion.}
 
 \item{precision}{Numeric; controls precision of hull expansion, default \code{1}.}
 
+\item{n_cores}{Integer or NULL. If greater than 1 or NULL, uses a parallel
+backend (via \code{\link[parallel:makeCluster]{parallel::makeCluster()}}) for some calculation intensive
+loops. If \code{NULL}, uses \code{parallel::detectCores() - 1} cores
+(minimum 1). Default \code{1}.}
+
 \item{verbose}{Logical; if \code{TRUE}, progress messages from the computational
 engine are printed, default \code{FALSE}.}
 
 \item{debug.plots}{Character string; controls generation of additional
 diagnostic plots for debugging, default \code{no}.}
+
+\item{timing}{Logical; if \code{TRUE}, prints a simple timing summary and adds a
+\code{timings} component (named numeric vector, elapsed seconds) to the returned
+object, default \code{FALSE}.}
 
 \item{col.loophull}{Fill colour used for the
 loop hull.}

@@ -30,8 +30,15 @@
 #'   approximating the bag-plot computation, default `300`.
 #' @param dkmethod Integer in `1:2`; depth kernel method, default `1`.
 #' @param precision Numeric; controls precision of hull expansion, default `1`.
+#' @param n_cores Integer or NULL. If greater than 1 or NULL, uses a parallel
+#'   backend (via [parallel::makeCluster()]) for some calculation intensive
+#'   loops. If `NULL`, uses `parallel::detectCores() - 1` cores
+#'   (minimum 1). Default `1`.
 #' @param verbose Logical; if `TRUE`, progress messages from the computational
 #'   engine are printed, default `FALSE`.
+#' @param timing Logical; if `TRUE`, prints a simple timing summary and adds a
+#'   `timings` component (named numeric vector, elapsed seconds) to the returned
+#'   object, default `FALSE`.
 #' @param debug.plots Character string; controls generation of additional
 #'   diagnostic plots for debugging, default `no`.
 #' @param show.outlier Logical; if `TRUE`, identified outliers are shown in
@@ -104,7 +111,9 @@ bag_whisker <- function(
     pch = 1, cex = 0.6, # some graphical parameters
     dkmethod = 1, # in 1:2; there are two methods for approximating the bag
     precision = 1, # controls precision of computation
+    n_cores = 1,
     verbose = FALSE, debug.plots = "no", # tools for debugging
+    timing = FALSE,
     col.loophull = "#aaccff", # Alternatives: #ccffaa, #ffaacc
     col.looppoints = "#3355ff", # Alternatives: #55ff33, #ff3355
     col.baghull = "#D3D3D3", # Alternatives: #99ff77, #ff7799
@@ -128,7 +137,7 @@ bag_whisker <- function(
   bo <- compute.bagWhiskerPlot(
     x = x, y = y, normal_inlier = normal_inlier, normal_outter = normal_outter, type1 = type1, q = q, factor = factor, na.rm = na.rm, asymp_dist_pv = asymp_dist_pv,
     approx.limit = approx.limit, dkmethod = dkmethod, center_type = center_type,
-    precision = precision, verbose = verbose, debug.plots = debug.plots
+    precision = precision, n_cores = n_cores, verbose = verbose, debug.plots = debug.plots, timing = timing
   )
   if (create.plot) {
     tmp_plt <- plot(bo,
