@@ -28,6 +28,8 @@
 #'   otherwise medians are used to impute, default `FALSE`.
 #' @param approx.limit Integer; threshold above which a subsample is used for
 #'   approximating the bag-plot computation, default `300`.
+#' @param naive_bag Logical; if `TRUE`, the bag is computed without 
+#'   expansion, default `FALSE`.
 #' @param dkmethod Integer in `1:2`; depth kernel method, default `1`.
 #' @param precision Numeric; controls precision of hull expansion, default `1`.
 #' @param n_cores Integer or NULL. If greater than 1 or NULL, uses a parallel
@@ -109,6 +111,7 @@ bag_whisker <- function(
     create.plot = TRUE, # if TRUE a plot is created
     add = FALSE, # if TRUE graphical elements are added to actual plot
     pch = 1, cex = 0.6, # some graphical parameters
+    naive_bag = FALSE, # if TRUE, the bag is computed without expansion
     dkmethod = 1, # in 1:2; there are two methods for approximating the bag
     precision = 1, # controls precision of computation
     n_cores = 1,
@@ -136,7 +139,7 @@ bag_whisker <- function(
   } # 180308
   bo <- compute.bagWhiskerPlot(
     x = x, y = y, normal_inlier = normal_inlier, normal_outter = normal_outter, type1 = type1, q = q, factor = factor, na.rm = na.rm, asymp_dist_pv = asymp_dist_pv,
-    approx.limit = approx.limit, dkmethod = dkmethod, center_type = center_type,
+    approx.limit = approx.limit, naive_bag = naive_bag, dkmethod = dkmethod, center_type = center_type,
     precision = precision, n_cores = n_cores, verbose = verbose, debug.plots = debug.plots, timing = timing
   )
   if (create.plot) {

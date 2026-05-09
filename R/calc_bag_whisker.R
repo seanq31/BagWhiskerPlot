@@ -8,6 +8,7 @@ compute.bagWhiskerPlot <- function(
     center_type = "hdepth",
     na.rm = FALSE, # should NAs removed or exchanged
     approx.limit = 300, # limit
+    naive_bag = FALSE,
     dkmethod = 2, # in 1:2; method 2 is recommended
     precision = 1, # controls precision of computation
     n_cores = 1,
@@ -857,10 +858,14 @@ compute.bagWhiskerPlot <- function(
       lines(h, col = "blue", lty = 3)
       points(center[1], center[2], pch = 8, col = "red")
     }
-    exp.dk <- expand.hull(pdk, k, n_cores = n_cores)
-    exp.dk.1 <- expand.hull(exp.dk, k - 1, n_cores = n_cores) # pdk.1,k-1,20)
-    # exp.dk <- pdk
-    # exp.dk.1 <- pdk
+    if (naive_bag) {
+      exp.dk <- pdk
+      exp.dk.1 <- pdk
+    } else {
+      exp.dk <- expand.hull(pdk, k, n_cores = n_cores)
+      exp.dk.1 <- expand.hull(exp.dk, k - 1, n_cores = n_cores) # pdk.1,k-1,20)
+    }
+    
     } else {
     # define direction for hdepth search
     num <- floor(2 * c(417, 351, 171, 85, 67, 43)[sum(n > c(1, 50, 100, 150, 200, 250))] * precision)
@@ -1450,7 +1455,7 @@ compute.bagWhiskerPlot <- function(
       testres <- list(th = NA_real_, de = logical(0))
     }
     # browser()
-    if (!is.finite(lambda_stat) || lambda_stat == 0 || sum(testres$de) == 0) {
+    if ((!is.finite(lambda_stat) || lambda_stat == 0 || sum(testres$de) == 0) && (type1 != "unadjusted")) {
       print("Warning: lambda_stat is infinite or zero, or no rejections in multiple testing procedure.")
       cut_pts <- find.cut.z.pg(xydata, hull.bag, center = center)
       center_mat <- matrix(center, nrow = nrow(xydata), ncol = 2, byrow = TRUE)

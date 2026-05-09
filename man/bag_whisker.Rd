@@ -27,6 +27,7 @@ bag_whisker(
   add = FALSE,
   pch = 1,
   cex = 0.6,
+  naive_bag = FALSE,
   dkmethod = 1,
   precision = 1,
   n_cores = 1,
@@ -101,6 +102,9 @@ plot; otherwise a new plot is started, default \code{FALSE}.}
 
 \item{pch, cex}{Graphical parameters forwarded to the plotting method to
 control point character and expansion.}
+
+\item{naive_bag}{Logical; if \code{TRUE}, the bag is computed without
+expansion, default \code{FALSE}.}
 
 \item{dkmethod}{Integer in \code{1:2}; depth kernel method, default \code{1}.}
 
