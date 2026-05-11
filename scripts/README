@@ -1,0 +1,11 @@
+Please install the BagWhiskerPlot package. 
+
+For Figure 2 and Figure 3 in the paper, change directory to "paper/toy_example", and run both R scripts. The resulting figures will be generate under "paper/toy_example/figures" folder. These scripts typically take a few seconds using a MacBook Air.
+
+For Figure 4-6 in the paper, change directory to "paper/simulation", and run all the R scripts. The resulting figures will be generate under "paper/simulation/figures" folder. These scripts typically take a few minutes using a MacBook Air.
+
+For Figure 7-10 in the paper, change directory to "paper/real_data", and run the R script. The resulting figures will be generate under "paper/real_data/figures" folder. These scripts typically take a few minutes using a MacBook Air.
+
+For Figure 1 and Figure 2 in the response letter, change directory to "response_letter/R1_RC3", and run both R scripts. The resulting figures will be generate under "response_letter/R1_RC3/figures" folder. These scripts typically take a few minutes using a MacBook Air.
+
+For Figure 3-5 in the response letter, change directory to "response_letter/R1_RC4", and run the R script. The resulting figures will be generate under "response_letter/R1_RC4/tables" folder. This script typically take around 8 hours using a 128-ARM-cpu cluster.
