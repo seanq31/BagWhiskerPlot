@@ -84,7 +84,7 @@ dat_cauchy <- cbind(x, y)
 # Step 4: Define experiment settings
 # Next: Create the parameter grid to iterate over.
 # ==============================================================================
-dist_settings <- c("log_normal")
+dist_settings <- c("normal_mixture", "log_normal")
 inlier_settings <- c(FALSE)
 outter_settings <- c(TRUE)
 redefine_loop_settings <- c(TRUE)
