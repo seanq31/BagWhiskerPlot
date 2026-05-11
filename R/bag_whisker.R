@@ -28,7 +28,7 @@
 #'   otherwise medians are used to impute, default `FALSE`.
 #' @param approx.limit Integer; threshold above which a subsample is used for
 #'   approximating the bag-plot computation, default `300`.
-#' @param naive_bag Logical; if `TRUE`, the bag is computed without 
+#' @param naive_bag Logical; if `TRUE`, the bag is computed without
 #'   expansion, default `FALSE`.
 #' @param dkmethod Integer in `1:2`; depth kernel method, default `1`.
 #' @param precision Numeric; controls precision of hull expansion, default `1`.
