@@ -12,9 +12,8 @@ compute.bagWhiskerPlot <- function(
     dkmethod = 2, # in 1:2; method 2 is recommended
     precision = 1, # controls precision of computation
     n_cores = 1,
-  verbose = FALSE, debug.plots = "no", # tools for debugging
-  timing = FALSE
-    ) {
+    verbose = FALSE, debug.plots = "no", # tools for debugging
+    timing = FALSE) {
   # define some functions
   win <- function(dx, dy) {
     atan2(y = dy, x = dx)
@@ -374,14 +373,19 @@ compute.bagWhiskerPlot <- function(
       return(eval.parent(substitute(expr)))
     }
     t0 <- proc.time()[["elapsed"]]
-    on.exit({
-      t1 <- proc.time()[["elapsed"]]
-      .bp_timer$add(label, t1 - t0)
-    }, add = TRUE)
+    on.exit(
+      {
+        t1 <- proc.time()[["elapsed"]]
+        .bp_timer$add(label, t1 - t0)
+      },
+      add = TRUE
+    )
     eval.parent(substitute(expr))
   }
   .bp_attach_timing <- function(res) {
-    if (!timing) return(res)
+    if (!timing) {
+      return(res)
+    }
     res$timings <- sort(.bp_timer$times, decreasing = TRUE)
     if (timing_print) {
       cat("Timing summary (elapsed seconds)\n")
@@ -566,317 +570,57 @@ compute.bagWhiskerPlot <- function(
   hull.center <- NULL
   .bp_time_it("center computation", {
     if (3 < nrow(xy) && length(hd.table) > 0) {
-    n.p <- floor(1.5 * c(32, 16, 8)[1 + (n > 50) + (n > 200)] * precision)
-    # limit.hdepth.to.check <- sort(hdepth, decreasing = TRUE)[min(nrow(xy),6)]
-    # 121126
-    h <- unique(sort(hdepth, decreasing = TRUE))
-    limit.hdepth.to.check <- sort(h)[min(length(h), 3)]
-    h <- cands <- xy[limit.hdepth.to.check <= hdepth, , drop = FALSE]
-    # h<-cands<-xy[rev(order(hdepth))[1:(min(nrow(xy),6))],]
-    cands <- cands[chull(cands[, 1], cands[, 2]), ]
-    n.c <- nrow(cands)
-    if (is.null(n.c)) cands <- h
+      n.p <- floor(1.5 * c(32, 16, 8)[1 + (n > 50) + (n > 200)] * precision)
+      # limit.hdepth.to.check <- sort(hdepth, decreasing = TRUE)[min(nrow(xy),6)]
+      # 121126
+      h <- unique(sort(hdepth, decreasing = TRUE))
+      limit.hdepth.to.check <- sort(h)[min(length(h), 3)]
+      h <- cands <- xy[limit.hdepth.to.check <= hdepth, , drop = FALSE]
+      # h<-cands<-xy[rev(order(hdepth))[1:(min(nrow(xy),6))],]
+      cands <- cands[chull(cands[, 1], cands[, 2]), ]
+      n.c <- nrow(cands)
+      if (is.null(n.c)) cands <- h
 
-    xyextr <- rbind(apply(cands, 2, min), apply(cands, 2, max))
-    ## xydel<-2*(xyextr[2,]-xyextr[1,])/n.p # unused
-    if ((xyextr[2, 1] - xyextr[1, 1]) < 0.2 * (h <- diff(range(xy[, 1])))) {
-      xyextr[1:2, 1] <- mean(xyextr[, 1]) + c(-.1, .1) * h
-    } ## 121203
-    if ((xyextr[2, 2] - xyextr[1, 2]) < 0.2 * (h <- diff(range(xy[, 2])))) {
-      xyextr[1:2, 2] <- mean(xyextr[, 2]) + c(-.1, .1) * h
-    } ## 121203
-    if (verbose) {
-      cat("xyextr: looking for maximal depth")
-      print(xyextr)
-    }
-    h1 <- seq(xyextr[1, 1], xyextr[2, 1], length = n.p)
-    h2 <- seq(xyextr[1, 2], xyextr[2, 2], length = n.p)
-    tp <- cbind(
-      as.vector(matrix(h1, n.p, n.p)), #      [1:n.p^2],
-      as.vector(matrix(h2, n.p, n.p, TRUE))
-    ) # [1:n.p^2])
-    # tphdepth<-max(hdepth.of.points(tp))-1
-    tphdepth <- max(find.hdepths.tp(tp, xy))
-    # if(verbose) { TP<<-tp; TPD<<-find.hdepths.tp(tp,xy) }
-    if (verbose) cat("points(TP,pch=c(letters,LETTERS)[TPD+1])")
-    # if max of testpoint is smaller than max depth of points take that max!
-    if (verbose) {
-      cat("depth of testpoints")
-      print(summary(tphdepth))
-    } # 121126
-    tphdepth <- max(tphdepth, d.k[, 2]) # 121004
+      xyextr <- rbind(apply(cands, 2, min), apply(cands, 2, max))
+      ## xydel<-2*(xyextr[2,]-xyextr[1,])/n.p # unused
+      if ((xyextr[2, 1] - xyextr[1, 1]) < 0.2 * (h <- diff(range(xy[, 1])))) {
+        xyextr[1:2, 1] <- mean(xyextr[, 1]) + c(-.1, .1) * h
+      } ## 121203
+      if ((xyextr[2, 2] - xyextr[1, 2]) < 0.2 * (h <- diff(range(xy[, 2])))) {
+        xyextr[1:2, 2] <- mean(xyextr[, 2]) + c(-.1, .1) * h
+      } ## 121203
+      if (verbose) {
+        cat("xyextr: looking for maximal depth")
+        print(xyextr)
+      }
+      h1 <- seq(xyextr[1, 1], xyextr[2, 1], length = n.p)
+      h2 <- seq(xyextr[1, 2], xyextr[2, 2], length = n.p)
+      tp <- cbind(
+        as.vector(matrix(h1, n.p, n.p)), #      [1:n.p^2],
+        as.vector(matrix(h2, n.p, n.p, TRUE))
+      ) # [1:n.p^2])
+      # tphdepth<-max(hdepth.of.points(tp))-1
+      tphdepth <- max(find.hdepths.tp(tp, xy))
+      # if(verbose) { TP<<-tp; TPD<<-find.hdepths.tp(tp,xy) }
+      if (verbose) cat("points(TP,pch=c(letters,LETTERS)[TPD+1])")
+      # if max of testpoint is smaller than max depth of points take that max!
+      if (verbose) {
+        cat("depth of testpoints")
+        print(summary(tphdepth))
+      } # 121126
+      tphdepth <- max(tphdepth, d.k[, 2]) # 121004
 
-    # define direction for hdepth search
-    num <- floor(2 * c(417, 351, 171, 85, 67, 43)[sum(n > c(1, 50, 100, 150, 200, 250))] * precision)
-    num.h <- floor(num / 2)
-    angles <- seq(0, pi, length = num.h)
-    ang <- tan(pi / 2 - angles)
-    kkk <- tphdepth
-    if (verbose) {
-      cat("max-hdepth found:")
-      print(kkk)
-    }
-    if (verbose) cat("find polygon with max depth")
-    ia <- 1
-    a <- angles[ia]
-    xyt <- xyxy %*% c(cos(a), -sin(a))
-    xyto <- order(xyt)
-    # initial for upper part
-    ind.k <- xyto[kkk]
-    cutp <- c(xyxy[ind.k, 1], -10)
-    dxy <- diff(range(xyxy))
-    pg <- rbind(c(cutp[1], -dxy, Inf), c(cutp[1], dxy, NA))
-    # initial for lower part
-    ind.kk <- xyto[n + 1 - kkk]
-    cutpl <- c(xyxy[ind.kk, 1], 10)
-    # pgl<-rbind(c(cutpl[1],dxy,Inf),c(cutpl[1],-dxy,NA))
-    pgl <- rbind(c(cutpl[1], dxy, -Inf), c(cutpl[1], -dxy, NA))
-    # the sign of inf doesn't matter
-    if (debug.plots == "all") {
-      plot(xyxy, type = "p", bty = "n")
-      text(xy, , 1:n, col = "blue")
-      hx <- xy[ind.k, c(1, 1)]
-      hy <- xy[ind.k, c(2, 2)]
-      segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-      text(hx + rnorm(1, , .1), hy + rnorm(1, , .1), ia)
-    }
-    if (verbose) cat("start of computation of the directions: ", "kkk=", kkk) # 121030
-    for (ia in seq(angles)[-1]) {
-      # determine critical points pnew and pnewl of direction a
-      # if(verbose) cat("ia",ia,angles[ia])
-      # 121030
-      a <- angles[ia]
-      angtan <- ang[ia]
-      xyt <- xyxy %*% c(cos(a), -sin(a))
-      xyto <- order(xyt)
-      ind.k <- xyto[kkk]
-      ind.kk <- xyto[n + 1 - kkk]
-      pnew <- xyxy[ind.k, ]
-      pnewl <- xyxy[ind.kk, ]
-      # if(verbose) if( 1 < sum(xyt == xyt[ind.k]) )print("WARNING: some points identical")
-      if (debug.plots == "all") points(pnew[1], pnew[2], col = "red")
-      # new limiting lines are defined by pnew / pnewl and slope a
-      # find segment of polygon that is cut by new limiting line and cut
-      # if(ia>200) { #<show pg pgl>#; points(pnew[1],pnew[2],col="magenta",cex=6) }
-      if (abs(angtan) > 1e10) {
-        if (verbose) cat("kkk", kkk, "x=c case")
-        # case of vertical slope #print(pg);print(pnew);print(xyt);lines(pg,col="red",lwd=3)
-        # number of points left of point pnew that limit the polygon
-        pg.no <- sum(pg[, 1] < pnew[1])
-        if (0 < pg.no) {
-          # the polygon (segment pg.no) has to be cut at x==pnew[1]
-          cutp <- c(pnew[1], pg[pg.no, 2] + pg[pg.no, 3] * (pnew[1] - pg[pg.no, 1]))
-          pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
-        } else {
-          if (verbose) cat("!!! case degenerated UPPER polygon: pg.no==0")
-          # the limiting point pnew is above the beginning of the polygon
-          # therefore, the polygon reduces to line
-          pg <- rbind(pg[1, ], c(pg[2, 1:2], NA))
-        }
-        pg.nol <- sum(pgl[, 1] >= pnewl[1])
-        if (0 < pg.nol) { ## ??2 # 121204
-          cutpl <- c(pnewl[1], pgl[pg.nol, 2] + pgl[pg.nol, 3] * (pnewl[1] - pgl[pg.nol, 1]))
-          pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
-        } else {
-          if (verbose) cat("!!! case degenerated LOWER polygon: pgl.no==0")
-          pgl <- rbind(pgl[1, ], c(pgl[2, 1:2], NA))
-        }
-      } else { # if(verbose) cat("kkk",kkk,"normal case")
-        # normal case upper polygon
-        pg.inter <- pg[, 2] - angtan * pg[, 1]
-        pnew.inter <- pnew[2] - angtan * pnew[1]
-        pg.no <- sum(pg.inter < pnew.inter)
-        if (is.na(pg[pg.no, 3])) pg[pg.no, 3] <- -Inf # 121129 NaN/Na error
-        cutp <- cut.p.sl.p.sl(pnew, ang[ia], pg[pg.no, 1:2], pg[pg.no, 3])
-        pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
-        # normal case lower polygon
-        pg.interl <- pgl[, 2] - angtan * pgl[, 1]
-        pnew.interl <- pnewl[2] - angtan * pnewl[1]
-        pg.nol <- sum(pg.interl > pnew.interl)
-        if (is.na(pgl[pg.nol, 3])) pgl[pg.nol, 3] <- Inf # 121129 NaN/Na error
-        cutpl <- cut.p.sl.p.sl(pnewl, angtan, pgl[pg.nol, 1:2], pgl[pg.nol, 3])
-        pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
+      # define direction for hdepth search
+      num <- floor(2 * c(417, 351, 171, 85, 67, 43)[sum(n > c(1, 50, 100, 150, 200, 250))] * precision)
+      num.h <- floor(num / 2)
+      angles <- seq(0, pi, length = num.h)
+      ang <- tan(pi / 2 - angles)
+      kkk <- tphdepth
+      if (verbose) {
+        cat("max-hdepth found:")
+        print(kkk)
       }
-      ## if(kkk==KKK && ia == 51) { cat("ENDE: pgl"); print(pgl) }
-      # update pg, pgl completed
-      # PG<<-pg;PG.NO<<-pg.no;CUTP<<-cutp;DXY<<-dxy;PNEW<<-pnew;PGL<<-pgl;PG.NOL<<-pg.nol
-      #########################################
-      #### cat("angtan",angtan,"pg.no",pg.no,"pkt:",pnew)
-      # if(ia==stopp) lines(pg,type="b",col="green")
-      if (debug.plots == "all") {
-        points(pnew[1], pnew[2], col = "red")
-        hx <- xyxy[ind.k, c(1, 1)]
-        hy <- xyxy[ind.k, c(2, 2)]
-        segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-        # text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
-        # print(pg)
-        # if(ia==stopp) lines(pgl,type="b",col="green")
-        points(cutpl[1], cutpl[2], col = "red")
-        hx <- xyxy[ind.kk, c(1, 1)]
-        hy <- xyxy[ind.kk, c(2, 2)]
-        segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-        #  text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
-        # print(pgl)
-      }
-      ## show pg pgl##
-    }
-    # if(verbose) PG <<- pg; PGL <<- pgl
-    if (2 < nrow(pg) && 2 < nrow(pgl)) {
-      ## plot(xyxy[,1:2],xlim=c(-.5,+.5),ylim=c(-.5,.50))
-      ## lines(pg,type="b",col="red"); lines(pgl,type="b",col="blue")
-      ## remove first and last points and multiple points #<show pg pgl>#
-      limit <- 1e-10
-      ## pg <-pg [c(TRUE,(abs(diff(pg [,1]))>limit)|(abs(diff(pg [,2]))>limit)),] old#
-      idx <- c(TRUE, (abs(diff(pg[, 1])) > limit) | (abs(diff(pg[, 2])) > limit)) # 121008
-      if (any(idx == FALSE)) {
-        pg <- pg[idx, ]
-        pg[, 3] <- c(diff(pg[, 2]) / diff(pg[, 1]), NA)
-      }
-      # old reduction which caused some errors:
-      ## pgl<-pgl[c(TRUE,(abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit)),] error##
-      ## pgl<-pgl[c(     (abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit),TRUE),] old#
-      idx <- c((abs(diff(pgl[, 1])) > limit) | (abs(diff(pgl[, 2])) > limit), TRUE) # 121008
-      if (any(idx == FALSE)) {
-        pgl <- pgl[idx, ]
-        pgl[, 3] <- c(diff(pgl[, 2]) / diff(pgl[, 1]), NA)
-      }
-      ## add some tolerance in course of numerical problems
-      pgl[, 2] <- pgl[, 2] - .00001 ## 121004
-      ## show pg pgl>>
-      pg <- pg[-nrow(pg), ][-1, , drop = FALSE]
-      pgl <- pgl[-nrow(pgl), ][-1, , drop = FALSE]
-      # determine position according to the other polygon
-      #   cat("relative position: lower polygon")
-      indl <- pos.to.pg(round(pgl, digits = 10), round(pg, digits = 10)) # 121126
-      #   cat("relative position: upper polygon")
-      indu <- pos.to.pg(round(pg, digits = 10), round(pgl, digits = 10), TRUE)
-      sr <- sl <- NULL # ; ##show pg pgl>>
-      # right region
-      if (indu[(npg <- nrow(pg))] == "lower" & indl[1] == "higher") {
-        # cat("in if of right region: the upper polynom is somewhere lower")
-        #  checking from the right: last point of lower polygon that is NOT ok
-        rnuml <- which(indl == "lower")[1] - 1
-        #  checking from the left: last point of upper polygon that is ok
-        rnumu <- npg + 1 - which(rev(indu == "higher"))[1]
-        #  special case all points of lower polygon are upper
-        if (is.na(rnuml)) rnuml <- sum(pg[rnumu, 1] < pgl[, 1])
-        #  special case all points of upper polygon are lower
-        if (is.na(rnumu)) rnumu <- sum(pg[, 1] < pgl[rnuml, 1])
-        xyl <- pgl[rnuml, ]
-        xyu <- pg[rnumu, ]
-        # cat("right"); print(rnuml); print(xyl)
-        # cat("right"); print(rnumu); print(xyu)
-        sr <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
-      }
-      # left region
-      if (indl[(npgl <- nrow(pgl))] == "higher" & indu[1] == "lower") {
-        # cat("in if of left region: the upper polynom is somewhere lower")
-        #  checking from the right: last point of lower polygon that is ok
-        lnuml <- npgl + 1 - which(rev(indl == "lower"))[1]
-        #  checking from the left: last point of upper polygon that is NOT ok
-        lnumu <- which(indu == "higher")[1] - 1
-        #  special case all points of lower polygon are upper
-        if (is.na(lnuml)) lnuml <- sum(pg[lnumu, 1] < pgl[, 1])
-        #  special case all points of upper polygon are lower
-        if (is.na(lnumu)) lnumu <- sum(pg[, 1] < pgl[lnuml, 1])
-        xyl <- pgl[lnuml, ]
-        xyu <- pg[lnumu, ]
-        # cat("left"); print(lnuml); print(xyl)
-        # cat("left"); print(lnumu); print(xyu)
-        sl <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
-      }
-      # if(kkk==2){ ##show pg pgl##; INDU<<-indu; INDL<<-indl; PGL<<-pgl; PGU<<-pg}
-      pg <- rbind(
-        pg[indu == "higher", 1:2, drop = FALSE], sr,
-        pgl[indl == "lower", 1:2, drop = FALSE], sl
-      )
-      if (debug.plots == "all") lines(rbind(pg, pg[1, ]), col = "red")
-      if (!any(is.na(pg))) pg <- pg[chull(pg[, 1], pg[, 2]), ]
-      # if(kkk==7){ PG <<- pg }
-    } else {
-      if (2 < nrow(pgl)) { # 121204
-        pg <- rbind(pg[2, 1:2], pgl[-c(1, length(pgl[, 1])), 1:2])
-      } else {
-        pg <- rbind(pg[-c(1, length(pg[, 1])), 1:2], pgl[2, 1:2])
-        # rbind(pgl[2,1:2],pg[2,1:2])
-      }
-    }
-    if (verbose) cat("END of computation of the directions")
-    # hull.center <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
-    hull.center <- apply(xydata[which(hdepth == max(hdepth)), , drop = FALSE], 2, mean)
-    # browser()
-    if (!any(is.na(hull.center))) {
-      if (center_type == "hdepth") {
-        center <- find.polygon.center(hull.center)
-      } else if (center_type == "mcd") {
-        center <- cov.mcd(xydata)$center
-      }
-    } else {
-      hull.center <- rbind(center)
-    } # 121126
-    if (verbose) {
-      cat("CENTER")
-      print(center)
-    }
-    if (verbose) {
-      cat("hull.center", hull.center)
-      print(table(tphdepth))
-    }
-    }
-    NULL
-  })
-  # if(verbose) cat("center depth:",hdepth.of.points(rbind(center))-1)
-  if (verbose) cat("center depth:", find.hdepths.tp(rbind(center), xy) - 1)
-  if (verbose) {
-    print("end of computation of center")
-    print(center)
-  }
-  .bp_time_it("bag polygons", {
-    if (dkmethod == 1) {
-    # inner hull of bag
-    xyi <- xy[hdepth >= k, , drop = FALSE] # cat("dim XYI", dim(xyi))
-    # 121028 some corrections for strange k situations
-    if (0 < length(xyi)) pdk <- xyi[chull(xyi[, 1], xyi[, 2]), , drop = FALSE]
-    # outer hull of bag
-    if (k > 1) {
-      xyo <- xy[hdepth >= (k - 1), , drop = FALSE]
-      pdk.1 <- xyo[chull(xyo[, 1], xyo[, 2]), , drop = FALSE]
-    } else {
-      pdk.1 <- pdk
-    }
-    if (0 == length(xyi)) pdk <- pdk.1
-    if (verbose) cat("hull computed: pdk, pdk.1:")
-    if (verbose) {
-      print(pdk)
-      print(pdk.1)
-    }
-    if (debug.plots == "all") {
-      plot(xy, bty = "n")
-      h <- rbind(pdk, pdk[1, ])
-      lines(h, col = "red", lty = 2)
-      h <- rbind(pdk.1, pdk.1[1, ])
-      lines(h, col = "blue", lty = 3)
-      points(center[1], center[2], pch = 8, col = "red")
-    }
-    if (naive_bag) {
-      exp.dk <- pdk
-      exp.dk.1 <- pdk
-    } else {
-      exp.dk <- expand.hull(pdk, k, n_cores = n_cores)
-      exp.dk.1 <- expand.hull(exp.dk, k - 1, n_cores = n_cores) # pdk.1,k-1,20)
-    }
-    
-    } else {
-    # define direction for hdepth search
-    num <- floor(2 * c(417, 351, 171, 85, 67, 43)[sum(n > c(1, 50, 100, 150, 200, 250))] * precision)
-    num.h <- floor(num / 2)
-    angles <- seq(0, pi, length = num.h)
-    ang <- tan(pi / 2 - angles)
-    # standardization of data set xyxy is used
-    kkk <- k
-    if (verbose) print("find polygon with depth something higher than that of the bag")
-    if (kkk <= max(d.k[, 2])) { # inner one # 121030
-
+      if (verbose) cat("find polygon with max depth")
       ia <- 1
       a <- angles[ia]
       xyt <- xyxy %*% c(cos(a), -sin(a))
@@ -1062,202 +806,461 @@ compute.bagWhiskerPlot <- function(
         }
       }
       if (verbose) cat("END of computation of the directions")
-      exp.dk <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
+      # hull.center <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
+      hull.center <- apply(xydata[which(hdepth == max(hdepth)), , drop = FALSE], 2, mean)
+      # browser()
+      if (!any(is.na(hull.center))) {
+        if (center_type == "hdepth") {
+          center <- find.polygon.center(hull.center)
+        } else if (center_type == "mcd") {
+          center <- cov.mcd(xydata)$center
+        }
+      } else {
+        hull.center <- rbind(center)
+      } # 121126
+      if (verbose) {
+        cat("CENTER")
+        print(center)
+      }
+      if (verbose) {
+        cat("hull.center", hull.center)
+        print(table(tphdepth))
+      }
+    }
+    NULL
+  })
+  # if(verbose) cat("center depth:",hdepth.of.points(rbind(center))-1)
+  if (verbose) cat("center depth:", find.hdepths.tp(rbind(center), xy) - 1)
+  if (verbose) {
+    print("end of computation of center")
+    print(center)
+  }
+  .bp_time_it("bag polygons", {
+    if (dkmethod == 1) {
+      # inner hull of bag
+      xyi <- xy[hdepth >= k, , drop = FALSE] # cat("dim XYI", dim(xyi))
+      # 121028 some corrections for strange k situations
+      if (0 < length(xyi)) pdk <- xyi[chull(xyi[, 1], xyi[, 2]), , drop = FALSE]
+      # outer hull of bag
+      if (k > 1) {
+        xyo <- xy[hdepth >= (k - 1), , drop = FALSE]
+        pdk.1 <- xyo[chull(xyo[, 1], xyo[, 2]), , drop = FALSE]
+      } else {
+        pdk.1 <- pdk
+      }
+      if (0 == length(xyi)) pdk <- pdk.1
+      if (verbose) cat("hull computed: pdk, pdk.1:")
+      if (verbose) {
+        print(pdk)
+        print(pdk.1)
+      }
+      if (debug.plots == "all") {
+        plot(xy, bty = "n")
+        h <- rbind(pdk, pdk[1, ])
+        lines(h, col = "red", lty = 2)
+        h <- rbind(pdk.1, pdk.1[1, ])
+        lines(h, col = "blue", lty = 3)
+        points(center[1], center[2], pch = 8, col = "red")
+      }
+      if (naive_bag) {
+        exp.dk <- pdk
+        exp.dk.1 <- pdk
+      } else {
+        exp.dk <- expand.hull(pdk, k, n_cores = n_cores)
+        exp.dk.1 <- expand.hull(exp.dk, k - 1, n_cores = n_cores) # pdk.1,k-1,20)
+      }
     } else {
-      exp.dk <- NULL
-    }
-    if (1 < kkk) kkk <- kkk - 1 # outer one
-    if (verbose) print("find polygon with depth a little bit lower than that of the bag")
-    ia <- 1
-    a <- angles[ia]
-    xyt <- xyxy %*% c(cos(a), -sin(a))
-    xyto <- order(xyt)
-    # initial for upper part
-    ind.k <- xyto[kkk]
-    cutp <- c(xyxy[ind.k, 1], -10)
-    dxy <- diff(range(xyxy))
-    pg <- rbind(c(cutp[1], -dxy, Inf), c(cutp[1], dxy, NA))
-    # initial for lower part
-    ind.kk <- xyto[n + 1 - kkk]
-    cutpl <- c(xyxy[ind.kk, 1], 10)
-    # pgl<-rbind(c(cutpl[1],dxy,Inf),c(cutpl[1],-dxy,NA))
-    pgl <- rbind(c(cutpl[1], dxy, -Inf), c(cutpl[1], -dxy, NA))
-    # the sign of inf doesn't matter
-    if (debug.plots == "all") {
-      plot(xyxy, type = "p", bty = "n")
-      text(xy, , 1:n, col = "blue")
-      hx <- xy[ind.k, c(1, 1)]
-      hy <- xy[ind.k, c(2, 2)]
-      segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-      text(hx + rnorm(1, , .1), hy + rnorm(1, , .1), ia)
-    }
-    if (verbose) cat("start of computation of the directions: ", "kkk=", kkk) # 121030
-    for (ia in seq(angles)[-1]) {
-      # determine critical points pnew and pnewl of direction a
-      # if(verbose) cat("ia",ia,angles[ia])
-      # 121030
+      # define direction for hdepth search
+      num <- floor(2 * c(417, 351, 171, 85, 67, 43)[sum(n > c(1, 50, 100, 150, 200, 250))] * precision)
+      num.h <- floor(num / 2)
+      angles <- seq(0, pi, length = num.h)
+      ang <- tan(pi / 2 - angles)
+      # standardization of data set xyxy is used
+      kkk <- k
+      if (verbose) print("find polygon with depth something higher than that of the bag")
+      if (kkk <= max(d.k[, 2])) { # inner one # 121030
+
+        ia <- 1
+        a <- angles[ia]
+        xyt <- xyxy %*% c(cos(a), -sin(a))
+        xyto <- order(xyt)
+        # initial for upper part
+        ind.k <- xyto[kkk]
+        cutp <- c(xyxy[ind.k, 1], -10)
+        dxy <- diff(range(xyxy))
+        pg <- rbind(c(cutp[1], -dxy, Inf), c(cutp[1], dxy, NA))
+        # initial for lower part
+        ind.kk <- xyto[n + 1 - kkk]
+        cutpl <- c(xyxy[ind.kk, 1], 10)
+        # pgl<-rbind(c(cutpl[1],dxy,Inf),c(cutpl[1],-dxy,NA))
+        pgl <- rbind(c(cutpl[1], dxy, -Inf), c(cutpl[1], -dxy, NA))
+        # the sign of inf doesn't matter
+        if (debug.plots == "all") {
+          plot(xyxy, type = "p", bty = "n")
+          text(xy, , 1:n, col = "blue")
+          hx <- xy[ind.k, c(1, 1)]
+          hy <- xy[ind.k, c(2, 2)]
+          segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
+          text(hx + rnorm(1, , .1), hy + rnorm(1, , .1), ia)
+        }
+        if (verbose) cat("start of computation of the directions: ", "kkk=", kkk) # 121030
+        for (ia in seq(angles)[-1]) {
+          # determine critical points pnew and pnewl of direction a
+          # if(verbose) cat("ia",ia,angles[ia])
+          # 121030
+          a <- angles[ia]
+          angtan <- ang[ia]
+          xyt <- xyxy %*% c(cos(a), -sin(a))
+          xyto <- order(xyt)
+          ind.k <- xyto[kkk]
+          ind.kk <- xyto[n + 1 - kkk]
+          pnew <- xyxy[ind.k, ]
+          pnewl <- xyxy[ind.kk, ]
+          # if(verbose) if( 1 < sum(xyt == xyt[ind.k]) )print("WARNING: some points identical")
+          if (debug.plots == "all") points(pnew[1], pnew[2], col = "red")
+          # new limiting lines are defined by pnew / pnewl and slope a
+          # find segment of polygon that is cut by new limiting line and cut
+          # if(ia>200) { #<show pg pgl>#; points(pnew[1],pnew[2],col="magenta",cex=6) }
+          if (abs(angtan) > 1e10) {
+            if (verbose) cat("kkk", kkk, "x=c case")
+            # case of vertical slope #print(pg);print(pnew);print(xyt);lines(pg,col="red",lwd=3)
+            # number of points left of point pnew that limit the polygon
+            pg.no <- sum(pg[, 1] < pnew[1])
+            if (0 < pg.no) {
+              # the polygon (segment pg.no) has to be cut at x==pnew[1]
+              cutp <- c(pnew[1], pg[pg.no, 2] + pg[pg.no, 3] * (pnew[1] - pg[pg.no, 1]))
+              pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
+            } else {
+              if (verbose) cat("!!! case degenerated UPPER polygon: pg.no==0")
+              # the limiting point pnew is above the beginning of the polygon
+              # therefore, the polygon reduces to line
+              pg <- rbind(pg[1, ], c(pg[2, 1:2], NA))
+            }
+            pg.nol <- sum(pgl[, 1] >= pnewl[1])
+            if (0 < pg.nol) { ## ??2 # 121204
+              cutpl <- c(pnewl[1], pgl[pg.nol, 2] + pgl[pg.nol, 3] * (pnewl[1] - pgl[pg.nol, 1]))
+              pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
+            } else {
+              if (verbose) cat("!!! case degenerated LOWER polygon: pgl.no==0")
+              pgl <- rbind(pgl[1, ], c(pgl[2, 1:2], NA))
+            }
+          } else { # if(verbose) cat("kkk",kkk,"normal case")
+            # normal case upper polygon
+            pg.inter <- pg[, 2] - angtan * pg[, 1]
+            pnew.inter <- pnew[2] - angtan * pnew[1]
+            pg.no <- sum(pg.inter < pnew.inter)
+            if (is.na(pg[pg.no, 3])) pg[pg.no, 3] <- -Inf # 121129 NaN/Na error
+            cutp <- cut.p.sl.p.sl(pnew, ang[ia], pg[pg.no, 1:2], pg[pg.no, 3])
+            pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
+            # normal case lower polygon
+            pg.interl <- pgl[, 2] - angtan * pgl[, 1]
+            pnew.interl <- pnewl[2] - angtan * pnewl[1]
+            pg.nol <- sum(pg.interl > pnew.interl)
+            if (is.na(pgl[pg.nol, 3])) pgl[pg.nol, 3] <- Inf # 121129 NaN/Na error
+            cutpl <- cut.p.sl.p.sl(pnewl, angtan, pgl[pg.nol, 1:2], pgl[pg.nol, 3])
+            pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
+          }
+          ## if(kkk==KKK && ia == 51) { cat("ENDE: pgl"); print(pgl) }
+          # update pg, pgl completed
+          # PG<<-pg;PG.NO<<-pg.no;CUTP<<-cutp;DXY<<-dxy;PNEW<<-pnew;PGL<<-pgl;PG.NOL<<-pg.nol
+          #########################################
+          #### cat("angtan",angtan,"pg.no",pg.no,"pkt:",pnew)
+          # if(ia==stopp) lines(pg,type="b",col="green")
+          if (debug.plots == "all") {
+            points(pnew[1], pnew[2], col = "red")
+            hx <- xyxy[ind.k, c(1, 1)]
+            hy <- xyxy[ind.k, c(2, 2)]
+            segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
+            # text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
+            # print(pg)
+            # if(ia==stopp) lines(pgl,type="b",col="green")
+            points(cutpl[1], cutpl[2], col = "red")
+            hx <- xyxy[ind.kk, c(1, 1)]
+            hy <- xyxy[ind.kk, c(2, 2)]
+            segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
+            #  text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
+            # print(pgl)
+          }
+          ## show pg pgl##
+        }
+        # if(verbose) PG <<- pg; PGL <<- pgl
+        if (2 < nrow(pg) && 2 < nrow(pgl)) {
+          ## plot(xyxy[,1:2],xlim=c(-.5,+.5),ylim=c(-.5,.50))
+          ## lines(pg,type="b",col="red"); lines(pgl,type="b",col="blue")
+          ## remove first and last points and multiple points #<show pg pgl>#
+          limit <- 1e-10
+          ## pg <-pg [c(TRUE,(abs(diff(pg [,1]))>limit)|(abs(diff(pg [,2]))>limit)),] old#
+          idx <- c(TRUE, (abs(diff(pg[, 1])) > limit) | (abs(diff(pg[, 2])) > limit)) # 121008
+          if (any(idx == FALSE)) {
+            pg <- pg[idx, ]
+            pg[, 3] <- c(diff(pg[, 2]) / diff(pg[, 1]), NA)
+          }
+          # old reduction which caused some errors:
+          ## pgl<-pgl[c(TRUE,(abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit)),] error##
+          ## pgl<-pgl[c(     (abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit),TRUE),] old#
+          idx <- c((abs(diff(pgl[, 1])) > limit) | (abs(diff(pgl[, 2])) > limit), TRUE) # 121008
+          if (any(idx == FALSE)) {
+            pgl <- pgl[idx, ]
+            pgl[, 3] <- c(diff(pgl[, 2]) / diff(pgl[, 1]), NA)
+          }
+          ## add some tolerance in course of numerical problems
+          pgl[, 2] <- pgl[, 2] - .00001 ## 121004
+          ## show pg pgl>>
+          pg <- pg[-nrow(pg), ][-1, , drop = FALSE]
+          pgl <- pgl[-nrow(pgl), ][-1, , drop = FALSE]
+          # determine position according to the other polygon
+          #   cat("relative position: lower polygon")
+          indl <- pos.to.pg(round(pgl, digits = 10), round(pg, digits = 10)) # 121126
+          #   cat("relative position: upper polygon")
+          indu <- pos.to.pg(round(pg, digits = 10), round(pgl, digits = 10), TRUE)
+          sr <- sl <- NULL # ; ##show pg pgl>>
+          # right region
+          if (indu[(npg <- nrow(pg))] == "lower" & indl[1] == "higher") {
+            # cat("in if of right region: the upper polynom is somewhere lower")
+            #  checking from the right: last point of lower polygon that is NOT ok
+            rnuml <- which(indl == "lower")[1] - 1
+            #  checking from the left: last point of upper polygon that is ok
+            rnumu <- npg + 1 - which(rev(indu == "higher"))[1]
+            #  special case all points of lower polygon are upper
+            if (is.na(rnuml)) rnuml <- sum(pg[rnumu, 1] < pgl[, 1])
+            #  special case all points of upper polygon are lower
+            if (is.na(rnumu)) rnumu <- sum(pg[, 1] < pgl[rnuml, 1])
+            xyl <- pgl[rnuml, ]
+            xyu <- pg[rnumu, ]
+            # cat("right"); print(rnuml); print(xyl)
+            # cat("right"); print(rnumu); print(xyu)
+            sr <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
+          }
+          # left region
+          if (indl[(npgl <- nrow(pgl))] == "higher" & indu[1] == "lower") {
+            # cat("in if of left region: the upper polynom is somewhere lower")
+            #  checking from the right: last point of lower polygon that is ok
+            lnuml <- npgl + 1 - which(rev(indl == "lower"))[1]
+            #  checking from the left: last point of upper polygon that is NOT ok
+            lnumu <- which(indu == "higher")[1] - 1
+            #  special case all points of lower polygon are upper
+            if (is.na(lnuml)) lnuml <- sum(pg[lnumu, 1] < pgl[, 1])
+            #  special case all points of upper polygon are lower
+            if (is.na(lnumu)) lnumu <- sum(pg[, 1] < pgl[lnuml, 1])
+            xyl <- pgl[lnuml, ]
+            xyu <- pg[lnumu, ]
+            # cat("left"); print(lnuml); print(xyl)
+            # cat("left"); print(lnumu); print(xyu)
+            sl <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
+          }
+          # if(kkk==2){ ##show pg pgl##; INDU<<-indu; INDL<<-indl; PGL<<-pgl; PGU<<-pg}
+          pg <- rbind(
+            pg[indu == "higher", 1:2, drop = FALSE], sr,
+            pgl[indl == "lower", 1:2, drop = FALSE], sl
+          )
+          if (debug.plots == "all") lines(rbind(pg, pg[1, ]), col = "red")
+          if (!any(is.na(pg))) pg <- pg[chull(pg[, 1], pg[, 2]), ]
+          # if(kkk==7){ PG <<- pg }
+        } else {
+          if (2 < nrow(pgl)) { # 121204
+            pg <- rbind(pg[2, 1:2], pgl[-c(1, length(pgl[, 1])), 1:2])
+          } else {
+            pg <- rbind(pg[-c(1, length(pg[, 1])), 1:2], pgl[2, 1:2])
+            # rbind(pgl[2,1:2],pg[2,1:2])
+          }
+        }
+        if (verbose) cat("END of computation of the directions")
+        exp.dk <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
+      } else {
+        exp.dk <- NULL
+      }
+      if (1 < kkk) kkk <- kkk - 1 # outer one
+      if (verbose) print("find polygon with depth a little bit lower than that of the bag")
+      ia <- 1
       a <- angles[ia]
-      angtan <- ang[ia]
       xyt <- xyxy %*% c(cos(a), -sin(a))
       xyto <- order(xyt)
+      # initial for upper part
       ind.k <- xyto[kkk]
+      cutp <- c(xyxy[ind.k, 1], -10)
+      dxy <- diff(range(xyxy))
+      pg <- rbind(c(cutp[1], -dxy, Inf), c(cutp[1], dxy, NA))
+      # initial for lower part
       ind.kk <- xyto[n + 1 - kkk]
-      pnew <- xyxy[ind.k, ]
-      pnewl <- xyxy[ind.kk, ]
-      # if(verbose) if( 1 < sum(xyt == xyt[ind.k]) )print("WARNING: some points identical")
-      if (debug.plots == "all") points(pnew[1], pnew[2], col = "red")
-      # new limiting lines are defined by pnew / pnewl and slope a
-      # find segment of polygon that is cut by new limiting line and cut
-      # if(ia>200) { #<show pg pgl>#; points(pnew[1],pnew[2],col="magenta",cex=6) }
-      if (abs(angtan) > 1e10) {
-        if (verbose) cat("kkk", kkk, "x=c case")
-        # case of vertical slope #print(pg);print(pnew);print(xyt);lines(pg,col="red",lwd=3)
-        # number of points left of point pnew that limit the polygon
-        pg.no <- sum(pg[, 1] < pnew[1])
-        if (0 < pg.no) {
-          # the polygon (segment pg.no) has to be cut at x==pnew[1]
-          cutp <- c(pnew[1], pg[pg.no, 2] + pg[pg.no, 3] * (pnew[1] - pg[pg.no, 1]))
-          pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
-        } else {
-          if (verbose) cat("!!! case degenerated UPPER polygon: pg.no==0")
-          # the limiting point pnew is above the beginning of the polygon
-          # therefore, the polygon reduces to line
-          pg <- rbind(pg[1, ], c(pg[2, 1:2], NA))
-        }
-        pg.nol <- sum(pgl[, 1] >= pnewl[1])
-        if (0 < pg.nol) { ## ??2 # 121204
-          cutpl <- c(pnewl[1], pgl[pg.nol, 2] + pgl[pg.nol, 3] * (pnewl[1] - pgl[pg.nol, 1]))
-          pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
-        } else {
-          if (verbose) cat("!!! case degenerated LOWER polygon: pgl.no==0")
-          pgl <- rbind(pgl[1, ], c(pgl[2, 1:2], NA))
-        }
-      } else { # if(verbose) cat("kkk",kkk,"normal case")
-        # normal case upper polygon
-        pg.inter <- pg[, 2] - angtan * pg[, 1]
-        pnew.inter <- pnew[2] - angtan * pnew[1]
-        pg.no <- sum(pg.inter < pnew.inter)
-        if (is.na(pg[pg.no, 3])) pg[pg.no, 3] <- -Inf # 121129 NaN/Na error
-        cutp <- cut.p.sl.p.sl(pnew, ang[ia], pg[pg.no, 1:2], pg[pg.no, 3])
-        pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
-        # normal case lower polygon
-        pg.interl <- pgl[, 2] - angtan * pgl[, 1]
-        pnew.interl <- pnewl[2] - angtan * pnewl[1]
-        pg.nol <- sum(pg.interl > pnew.interl)
-        if (is.na(pgl[pg.nol, 3])) pgl[pg.nol, 3] <- Inf # 121129 NaN/Na error
-        cutpl <- cut.p.sl.p.sl(pnewl, angtan, pgl[pg.nol, 1:2], pgl[pg.nol, 3])
-        pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
-      }
-      ## if(kkk==KKK && ia == 51) { cat("ENDE: pgl"); print(pgl) }
-      # update pg, pgl completed
-      # PG<<-pg;PG.NO<<-pg.no;CUTP<<-cutp;DXY<<-dxy;PNEW<<-pnew;PGL<<-pgl;PG.NOL<<-pg.nol
-      #########################################
-      #### cat("angtan",angtan,"pg.no",pg.no,"pkt:",pnew)
-      # if(ia==stopp) lines(pg,type="b",col="green")
+      cutpl <- c(xyxy[ind.kk, 1], 10)
+      # pgl<-rbind(c(cutpl[1],dxy,Inf),c(cutpl[1],-dxy,NA))
+      pgl <- rbind(c(cutpl[1], dxy, -Inf), c(cutpl[1], -dxy, NA))
+      # the sign of inf doesn't matter
       if (debug.plots == "all") {
-        points(pnew[1], pnew[2], col = "red")
-        hx <- xyxy[ind.k, c(1, 1)]
-        hy <- xyxy[ind.k, c(2, 2)]
+        plot(xyxy, type = "p", bty = "n")
+        text(xy, , 1:n, col = "blue")
+        hx <- xy[ind.k, c(1, 1)]
+        hy <- xy[ind.k, c(2, 2)]
         segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-        # text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
-        # print(pg)
-        # if(ia==stopp) lines(pgl,type="b",col="green")
-        points(cutpl[1], cutpl[2], col = "red")
-        hx <- xyxy[ind.kk, c(1, 1)]
-        hy <- xyxy[ind.kk, c(2, 2)]
-        segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
-        #  text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
-        # print(pgl)
+        text(hx + rnorm(1, , .1), hy + rnorm(1, , .1), ia)
       }
-      ## show pg pgl##
-    }
-    # if(verbose) PG <<- pg; PGL <<- pgl
-    if (2 < nrow(pg) && 2 < nrow(pgl)) {
-      ## plot(xyxy[,1:2],xlim=c(-.5,+.5),ylim=c(-.5,.50))
-      ## lines(pg,type="b",col="red"); lines(pgl,type="b",col="blue")
-      ## remove first and last points and multiple points #<show pg pgl>#
-      limit <- 1e-10
-      ## pg <-pg [c(TRUE,(abs(diff(pg [,1]))>limit)|(abs(diff(pg [,2]))>limit)),] old#
-      idx <- c(TRUE, (abs(diff(pg[, 1])) > limit) | (abs(diff(pg[, 2])) > limit)) # 121008
-      if (any(idx == FALSE)) {
-        pg <- pg[idx, ]
-        pg[, 3] <- c(diff(pg[, 2]) / diff(pg[, 1]), NA)
+      if (verbose) cat("start of computation of the directions: ", "kkk=", kkk) # 121030
+      for (ia in seq(angles)[-1]) {
+        # determine critical points pnew and pnewl of direction a
+        # if(verbose) cat("ia",ia,angles[ia])
+        # 121030
+        a <- angles[ia]
+        angtan <- ang[ia]
+        xyt <- xyxy %*% c(cos(a), -sin(a))
+        xyto <- order(xyt)
+        ind.k <- xyto[kkk]
+        ind.kk <- xyto[n + 1 - kkk]
+        pnew <- xyxy[ind.k, ]
+        pnewl <- xyxy[ind.kk, ]
+        # if(verbose) if( 1 < sum(xyt == xyt[ind.k]) )print("WARNING: some points identical")
+        if (debug.plots == "all") points(pnew[1], pnew[2], col = "red")
+        # new limiting lines are defined by pnew / pnewl and slope a
+        # find segment of polygon that is cut by new limiting line and cut
+        # if(ia>200) { #<show pg pgl>#; points(pnew[1],pnew[2],col="magenta",cex=6) }
+        if (abs(angtan) > 1e10) {
+          if (verbose) cat("kkk", kkk, "x=c case")
+          # case of vertical slope #print(pg);print(pnew);print(xyt);lines(pg,col="red",lwd=3)
+          # number of points left of point pnew that limit the polygon
+          pg.no <- sum(pg[, 1] < pnew[1])
+          if (0 < pg.no) {
+            # the polygon (segment pg.no) has to be cut at x==pnew[1]
+            cutp <- c(pnew[1], pg[pg.no, 2] + pg[pg.no, 3] * (pnew[1] - pg[pg.no, 1]))
+            pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
+          } else {
+            if (verbose) cat("!!! case degenerated UPPER polygon: pg.no==0")
+            # the limiting point pnew is above the beginning of the polygon
+            # therefore, the polygon reduces to line
+            pg <- rbind(pg[1, ], c(pg[2, 1:2], NA))
+          }
+          pg.nol <- sum(pgl[, 1] >= pnewl[1])
+          if (0 < pg.nol) { ## ??2 # 121204
+            cutpl <- c(pnewl[1], pgl[pg.nol, 2] + pgl[pg.nol, 3] * (pnewl[1] - pgl[pg.nol, 1]))
+            pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
+          } else {
+            if (verbose) cat("!!! case degenerated LOWER polygon: pgl.no==0")
+            pgl <- rbind(pgl[1, ], c(pgl[2, 1:2], NA))
+          }
+        } else { # if(verbose) cat("kkk",kkk,"normal case")
+          # normal case upper polygon
+          pg.inter <- pg[, 2] - angtan * pg[, 1]
+          pnew.inter <- pnew[2] - angtan * pnew[1]
+          pg.no <- sum(pg.inter < pnew.inter)
+          if (is.na(pg[pg.no, 3])) pg[pg.no, 3] <- -Inf # 121129 NaN/Na error
+          cutp <- cut.p.sl.p.sl(pnew, ang[ia], pg[pg.no, 1:2], pg[pg.no, 3])
+          pg <- rbind(pg[1:pg.no, ], c(cutp, angtan), c(cutp[1] + dxy, cutp[2] + angtan * dxy, NA))
+          # normal case lower polygon
+          pg.interl <- pgl[, 2] - angtan * pgl[, 1]
+          pnew.interl <- pnewl[2] - angtan * pnewl[1]
+          pg.nol <- sum(pg.interl > pnew.interl)
+          if (is.na(pgl[pg.nol, 3])) pgl[pg.nol, 3] <- Inf # 121129 NaN/Na error
+          cutpl <- cut.p.sl.p.sl(pnewl, angtan, pgl[pg.nol, 1:2], pgl[pg.nol, 3])
+          pgl <- rbind(pgl[1:pg.nol, ], c(cutpl, angtan), c(cutpl[1] - dxy, cutpl[2] - angtan * dxy, NA))
+        }
+        ## if(kkk==KKK && ia == 51) { cat("ENDE: pgl"); print(pgl) }
+        # update pg, pgl completed
+        # PG<<-pg;PG.NO<<-pg.no;CUTP<<-cutp;DXY<<-dxy;PNEW<<-pnew;PGL<<-pgl;PG.NOL<<-pg.nol
+        #########################################
+        #### cat("angtan",angtan,"pg.no",pg.no,"pkt:",pnew)
+        # if(ia==stopp) lines(pg,type="b",col="green")
+        if (debug.plots == "all") {
+          points(pnew[1], pnew[2], col = "red")
+          hx <- xyxy[ind.k, c(1, 1)]
+          hy <- xyxy[ind.k, c(2, 2)]
+          segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
+          # text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
+          # print(pg)
+          # if(ia==stopp) lines(pgl,type="b",col="green")
+          points(cutpl[1], cutpl[2], col = "red")
+          hx <- xyxy[ind.kk, c(1, 1)]
+          hy <- xyxy[ind.kk, c(2, 2)]
+          segments(hx, hy, c(10, -10), hy + ang[ia] * (c(10, -10) - hx), lty = 2)
+          #  text(hx+rnorm(1,,.1),hy+rnorm(1,,.1),ia)
+          # print(pgl)
+        }
+        ## show pg pgl##
       }
-      # old reduction which caused some errors:
-      ## pgl<-pgl[c(TRUE,(abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit)),] error##
-      ## pgl<-pgl[c(     (abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit),TRUE),] old#
-      idx <- c((abs(diff(pgl[, 1])) > limit) | (abs(diff(pgl[, 2])) > limit), TRUE) # 121008
-      if (any(idx == FALSE)) {
-        pgl <- pgl[idx, ]
-        pgl[, 3] <- c(diff(pgl[, 2]) / diff(pgl[, 1]), NA)
-      }
-      ## add some tolerance in course of numerical problems
-      pgl[, 2] <- pgl[, 2] - .00001 ## 121004
-      ## show pg pgl>>
-      pg <- pg[-nrow(pg), ][-1, , drop = FALSE]
-      pgl <- pgl[-nrow(pgl), ][-1, , drop = FALSE]
-      # determine position according to the other polygon
-      #   cat("relative position: lower polygon")
-      indl <- pos.to.pg(round(pgl, digits = 10), round(pg, digits = 10)) # 121126
-      #   cat("relative position: upper polygon")
-      indu <- pos.to.pg(round(pg, digits = 10), round(pgl, digits = 10), TRUE)
-      sr <- sl <- NULL # ; ##show pg pgl>>
-      # right region
-      if (indu[(npg <- nrow(pg))] == "lower" & indl[1] == "higher") {
-        # cat("in if of right region: the upper polynom is somewhere lower")
-        #  checking from the right: last point of lower polygon that is NOT ok
-        rnuml <- which(indl == "lower")[1] - 1
-        #  checking from the left: last point of upper polygon that is ok
-        rnumu <- npg + 1 - which(rev(indu == "higher"))[1]
-        #  special case all points of lower polygon are upper
-        if (is.na(rnuml)) rnuml <- sum(pg[rnumu, 1] < pgl[, 1])
-        #  special case all points of upper polygon are lower
-        if (is.na(rnumu)) rnumu <- sum(pg[, 1] < pgl[rnuml, 1])
-        xyl <- pgl[rnuml, ]
-        xyu <- pg[rnumu, ]
-        # cat("right"); print(rnuml); print(xyl)
-        # cat("right"); print(rnumu); print(xyu)
-        sr <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
-      }
-      # left region
-      if (indl[(npgl <- nrow(pgl))] == "higher" & indu[1] == "lower") {
-        # cat("in if of left region: the upper polynom is somewhere lower")
-        #  checking from the right: last point of lower polygon that is ok
-        lnuml <- npgl + 1 - which(rev(indl == "lower"))[1]
-        #  checking from the left: last point of upper polygon that is NOT ok
-        lnumu <- which(indu == "higher")[1] - 1
-        #  special case all points of lower polygon are upper
-        if (is.na(lnuml)) lnuml <- sum(pg[lnumu, 1] < pgl[, 1])
-        #  special case all points of upper polygon are lower
-        if (is.na(lnumu)) lnumu <- sum(pg[, 1] < pgl[lnuml, 1])
-        xyl <- pgl[lnuml, ]
-        xyu <- pg[lnumu, ]
-        # cat("left"); print(lnuml); print(xyl)
-        # cat("left"); print(lnumu); print(xyu)
-        sl <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
-      }
-      # browser()
-      # if(kkk==2){ ##show pg pgl##; INDU<<-indu; INDL<<-indl; PGL<<-pgl; PGU<<-pg}
-      pg <- rbind(
-        pg[indu == "higher", 1:2, drop = FALSE], sr,
-        pgl[indl == "lower", 1:2, drop = FALSE], sl
-      )
-      if (debug.plots == "all") lines(rbind(pg, pg[1, ]), col = "red")
-      if (!any(is.na(pg))) pg <- pg[chull(pg[, 1], pg[, 2]), ]
-      # if(kkk==7){ PG <<- pg }
-    } else {
-      if (2 < nrow(pgl)) { # 121204
-        pg <- rbind(pg[2, 1:2], pgl[-c(1, length(pgl[, 1])), 1:2])
+      # if(verbose) PG <<- pg; PGL <<- pgl
+      if (2 < nrow(pg) && 2 < nrow(pgl)) {
+        ## plot(xyxy[,1:2],xlim=c(-.5,+.5),ylim=c(-.5,.50))
+        ## lines(pg,type="b",col="red"); lines(pgl,type="b",col="blue")
+        ## remove first and last points and multiple points #<show pg pgl>#
+        limit <- 1e-10
+        ## pg <-pg [c(TRUE,(abs(diff(pg [,1]))>limit)|(abs(diff(pg [,2]))>limit)),] old#
+        idx <- c(TRUE, (abs(diff(pg[, 1])) > limit) | (abs(diff(pg[, 2])) > limit)) # 121008
+        if (any(idx == FALSE)) {
+          pg <- pg[idx, ]
+          pg[, 3] <- c(diff(pg[, 2]) / diff(pg[, 1]), NA)
+        }
+        # old reduction which caused some errors:
+        ## pgl<-pgl[c(TRUE,(abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit)),] error##
+        ## pgl<-pgl[c(     (abs(diff(pgl[,1]))>limit)|(abs(diff(pgl[,2]))>limit),TRUE),] old#
+        idx <- c((abs(diff(pgl[, 1])) > limit) | (abs(diff(pgl[, 2])) > limit), TRUE) # 121008
+        if (any(idx == FALSE)) {
+          pgl <- pgl[idx, ]
+          pgl[, 3] <- c(diff(pgl[, 2]) / diff(pgl[, 1]), NA)
+        }
+        ## add some tolerance in course of numerical problems
+        pgl[, 2] <- pgl[, 2] - .00001 ## 121004
+        ## show pg pgl>>
+        pg <- pg[-nrow(pg), ][-1, , drop = FALSE]
+        pgl <- pgl[-nrow(pgl), ][-1, , drop = FALSE]
+        # determine position according to the other polygon
+        #   cat("relative position: lower polygon")
+        indl <- pos.to.pg(round(pgl, digits = 10), round(pg, digits = 10)) # 121126
+        #   cat("relative position: upper polygon")
+        indu <- pos.to.pg(round(pg, digits = 10), round(pgl, digits = 10), TRUE)
+        sr <- sl <- NULL # ; ##show pg pgl>>
+        # right region
+        if (indu[(npg <- nrow(pg))] == "lower" & indl[1] == "higher") {
+          # cat("in if of right region: the upper polynom is somewhere lower")
+          #  checking from the right: last point of lower polygon that is NOT ok
+          rnuml <- which(indl == "lower")[1] - 1
+          #  checking from the left: last point of upper polygon that is ok
+          rnumu <- npg + 1 - which(rev(indu == "higher"))[1]
+          #  special case all points of lower polygon are upper
+          if (is.na(rnuml)) rnuml <- sum(pg[rnumu, 1] < pgl[, 1])
+          #  special case all points of upper polygon are lower
+          if (is.na(rnumu)) rnumu <- sum(pg[, 1] < pgl[rnuml, 1])
+          xyl <- pgl[rnuml, ]
+          xyu <- pg[rnumu, ]
+          # cat("right"); print(rnuml); print(xyl)
+          # cat("right"); print(rnumu); print(xyu)
+          sr <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
+        }
+        # left region
+        if (indl[(npgl <- nrow(pgl))] == "higher" & indu[1] == "lower") {
+          # cat("in if of left region: the upper polynom is somewhere lower")
+          #  checking from the right: last point of lower polygon that is ok
+          lnuml <- npgl + 1 - which(rev(indl == "lower"))[1]
+          #  checking from the left: last point of upper polygon that is NOT ok
+          lnumu <- which(indu == "higher")[1] - 1
+          #  special case all points of lower polygon are upper
+          if (is.na(lnuml)) lnuml <- sum(pg[lnumu, 1] < pgl[, 1])
+          #  special case all points of upper polygon are lower
+          if (is.na(lnumu)) lnumu <- sum(pg[, 1] < pgl[lnuml, 1])
+          xyl <- pgl[lnuml, ]
+          xyu <- pg[lnumu, ]
+          # cat("left"); print(lnuml); print(xyl)
+          # cat("left"); print(lnumu); print(xyu)
+          sl <- cut.p.sl.p.sl(xyl[1:2], xyl[3], xyu[1:2], xyu[3])
+        }
+        # browser()
+        # if(kkk==2){ ##show pg pgl##; INDU<<-indu; INDL<<-indl; PGL<<-pgl; PGU<<-pg}
+        pg <- rbind(
+          pg[indu == "higher", 1:2, drop = FALSE], sr,
+          pgl[indl == "lower", 1:2, drop = FALSE], sl
+        )
+        if (debug.plots == "all") lines(rbind(pg, pg[1, ]), col = "red")
+        if (!any(is.na(pg))) pg <- pg[chull(pg[, 1], pg[, 2]), ]
+        # if(kkk==7){ PG <<- pg }
       } else {
-        pg <- rbind(pg[-c(1, length(pg[, 1])), 1:2], pgl[2, 1:2])
-        # rbind(pgl[2,1:2],pg[2,1:2])
+        if (2 < nrow(pgl)) { # 121204
+          pg <- rbind(pg[2, 1:2], pgl[-c(1, length(pgl[, 1])), 1:2])
+        } else {
+          pg <- rbind(pg[-c(1, length(pg[, 1])), 1:2], pgl[2, 1:2])
+          # rbind(pgl[2,1:2],pg[2,1:2])
+        }
       }
-    }
-    if (verbose) cat("END of computation of the directions")
-    exp.dk.1 <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
-    if (is.null(exp.dk)) exp.dk <- exp.dk.1
-    # EX.1 <<- exp.dk.1; EX   <<- exp.dk
-    if (verbose) print("End of find hulls, method two")
+      if (verbose) cat("END of computation of the directions")
+      exp.dk.1 <- cbind(pg[, 1] * xysd[1] + xym[1], pg[, 2] * xysd[2] + xym[2])
+      if (is.null(exp.dk)) exp.dk <- exp.dk.1
+      # EX.1 <<- exp.dk.1; EX   <<- exp.dk
+      if (verbose) print("End of find hulls, method two")
     }
     NULL
   })

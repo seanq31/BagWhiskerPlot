@@ -1,4 +1,4 @@
-#' Bag-and-whisker plot implementation, with outlier detection 
+#' Bag-and-whisker plot implementation, with outlier detection
 #' under different type-I error controls
 #'
 #' @description

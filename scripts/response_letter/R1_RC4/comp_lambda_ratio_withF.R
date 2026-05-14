@@ -7,9 +7,9 @@ set.seed(seed_base)
 
 n_reps <- 500
 
-library(foreach)      # makes %dopar% available
-library(doParallel)   # optional, but consistent with registerDoParallel()
-library(doSNOW)   # <- add
+library(foreach) # makes %dopar% available
+library(doParallel) # optional, but consistent with registerDoParallel()
+library(doSNOW) # <- add
 library(ggplot2)
 library(cowplot)
 library(grid)
@@ -133,9 +133,12 @@ n_tasks <- nrow(task_grid)
 # ==============================================================================
 cl <- parallel::makeCluster(80)
 doSNOW::registerDoSNOW(cl)
-on.exit({
-  try(parallel::stopCluster(cl), silent = TRUE)
-}, add = TRUE)
+on.exit(
+  {
+    try(parallel::stopCluster(cl), silent = TRUE)
+  },
+  add = TRUE
+)
 
 pb <- txtProgressBar(min = 0, max = n_tasks, style = 3)
 on.exit(close(pb), add = TRUE)
@@ -151,7 +154,7 @@ results <- foreach::foreach(
   task_idx = seq_len(n_tasks),
   .combine = rbind,
   .packages = c("BagWhiskerPlot", "MASS", "parallel"),
-  .options.snow = opts          # <- add
+  .options.snow = opts # <- add
 ) %dopar% {
   setting_idx <- task_grid$setting_idx[[task_idx]]
   rep_idx <- task_grid$rep_idx[[task_idx]]
@@ -234,7 +237,7 @@ for (summary_setting_idx in seq_len(nrow(summary_settings))) {
   p_heatmap <- ggplot(dist_summary, aes(x = p, y = factor(n), fill = lambda_data_over_stat)) +
     geom_tile() +
     scale_fill_gradient2(low = "#3B5B92", mid = "#D0D0D0", high = "#9C3A3A", midpoint = 0.85, limits = c(0.69, 1.0)) +
-    labs(x = "p", y = "n", fill = expression(lambda[plain(data)]/lambda[plain(stat)])) +
+    labs(x = "p", y = "n", fill = expression(lambda[plain(data)] / lambda[plain(stat)])) +
     theme_minimal()
   outfile_heatmap <- file.path(save_dir, paste0("lambda_data_over_stat_heatmap_", summary_setting$dist, "_", summary_setting$asymp_dist_pv, ".jpeg"))
   ggsave(outfile_heatmap, p_heatmap, width = 6, height = 4)
@@ -254,23 +257,22 @@ for (dist_setting in dist_settings) {
 
   grobs <- c(lapply(img_paths, read_img_grob))
   labels <- c(
-      "(a) Chi-square approximation, FDR, q=0.1",
-      "(b) F approximation, FDR, q=0.1"
+    "(a) Chi-square approximation, FDR, q=0.1",
+    "(b) F approximation, FDR, q=0.1"
   )
   labeled <- mapply(function(g, lb) {
-  ggdraw() +
+    ggdraw() +
       draw_grob(g, x = 0, y = 0, width = 1, height = 0.92) +
       draw_label(lb,
-      x = 0.02, y = 0.98, hjust = 0, vjust = 1,
-      fontface = "bold", size = 18, color = "black"
+        x = 0.02, y = 0.98, hjust = 0, vjust = 1,
+        fontface = "bold", size = 18, color = "black"
       )
   }, grobs, labels, SIMPLIFY = FALSE)
 
   combined <- plot_grid(plotlist = labeled, ncol = 2)
   ggsave(
-  filename = file.path(save_dir, paste0("lambda_data_over_stat_heatmap_", dist_setting, ".jpeg")),
-  plot = combined,
-  width = 12, height = 5, dpi = 300, bg = "white"
+    filename = file.path(save_dir, paste0("lambda_data_over_stat_heatmap_", dist_setting, ".jpeg")),
+    plot = combined,
+    width = 12, height = 5, dpi = 300, bg = "white"
   )
 }
-

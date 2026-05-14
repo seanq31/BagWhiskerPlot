@@ -637,8 +637,8 @@ bp_build_layers <- function(
 #'
 #' @details
 #' The function is a \code{plot} method for \code{bagWhiskerPlot} objects and
-#' relies on \pkg{ggplot2} for rendering. 
-#' 
+#' relies on \pkg{ggplot2} for rendering.
+#'
 #' @return A \code{\link[ggplot2:ggplot]{ggplot}} object representing the
 #'   bag-whisker plot, returned invisibly. The plot is drawn as a side effect
 #'   when \code{add = FALSE} or when \code{add = TRUE} with an existing

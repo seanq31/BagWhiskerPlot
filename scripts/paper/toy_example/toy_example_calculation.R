@@ -12,27 +12,25 @@ set.seed(1234)
 # Step 2: Configure output paths
 # Next: Define where figures will be written.
 # ==============================================================================
-save_dir = './figures/'
+save_dir <- "./figures/"
 
 # ==============================================================================
 # Step 3: Define toy example data
 # Next: Create the fixed 2D dataset used in the toy example.
 # ==============================================================================
-dat_toy_eg = matrix(
+dat_toy_eg <- matrix(
   c(
-    7,5,
-
-    7,7,
-    9,4,
-    5,4,
-
-    14,9,
-    0,9,
-    7,-3,
-
+    7, 5,
+    7, 7,
+    9, 4,
+    5, 4,
+    14, 9,
+    0, 9,
+    7, -3,
     19, 20
-  ), 
-  ncol = 2, byrow = TRUE)
+  ),
+  ncol = 2, byrow = TRUE
+)
 
 colnames(dat_toy_eg) <- c("x", "y")
 
@@ -72,8 +70,8 @@ df_toy$ptype <- c(
 # Next: Set axis limits so half-spaces and annotations are visible.
 # ==============================================================================
 # Define plot limits to ensure half-spaces are visible within a reasonable range
-x_limits = c(-4, 20)
-y_limits = c(-4, 20)
+x_limits <- c(-4, 20)
+y_limits <- c(-4, 20)
 
 # ==============================================================================
 # Step 6: Build the figure
@@ -82,7 +80,7 @@ y_limits = c(-4, 20)
 # Create the plot
 p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
   scale_color_identity(guide = "none") +
-  
+
   # PURPLE half-space: y <= -0.55x+8.85
   geom_abline(intercept = 8.85, slope = -0.55, color = "red", linetype = "dashed", alpha = 0.3) +
   geom_polygon_pattern(
@@ -94,7 +92,7 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     inherit.aes = FALSE,
     fill = NA,
     color = NA,
-    pattern = 'stripe',
+    pattern = "stripe",
     pattern_fill = "red",
     pattern_colour = "red",
     pattern_angle = 135,
@@ -115,7 +113,7 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     inherit.aes = FALSE,
     fill = NA,
     color = NA,
-    pattern = 'stripe',
+    pattern = "stripe",
     pattern_fill = "blue",
     pattern_colour = "blue",
     pattern_angle = 0,
@@ -136,7 +134,7 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     inherit.aes = FALSE,
     fill = NA,
     color = NA,
-    pattern = 'stripe',
+    pattern = "stripe",
     pattern_fill = "orange",
     pattern_colour = "orange",
     pattern_angle = 45,
@@ -150,10 +148,10 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
   geom_polygon(
     data = data.frame(
       x = c(
-        dat_toy_eg[2,1], dat_toy_eg[3,1], dat_toy_eg[4,1]
+        dat_toy_eg[2, 1], dat_toy_eg[3, 1], dat_toy_eg[4, 1]
       ),
       y = c(
-        dat_toy_eg[2,2], dat_toy_eg[3,2], dat_toy_eg[4,2]
+        dat_toy_eg[2, 2], dat_toy_eg[3, 2], dat_toy_eg[4, 2]
       )
     ),
     aes(x = x, y = y),
@@ -179,7 +177,7 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     show.legend = FALSE
   ) +
   scale_shape_manual(
-    values = c('solid' = 1, 'hollow' = 1, 'star' = 8, 'large' = 19),
+    values = c("solid" = 1, "hollow" = 1, "star" = 8, "large" = 19),
     guide = "none"
   ) +
   scale_color_identity(guide = "none") +
@@ -199,11 +197,11 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     strip.text = ggplot2::element_text(size = 18)
   )
 
-  # ==============================================================================
-  # Step 7: Add annotations
-  # Next: Add an arrow annotation and finalize background styling.
-  # ==============================================================================
-  # add arrow from (5,5) to (12,6)
+# ==============================================================================
+# Step 7: Add annotations
+# Next: Add an arrow annotation and finalize background styling.
+# ==============================================================================
+# add arrow from (5,5) to (12,6)
 p <- p +
   geom_segment(
     data = data.frame(x = 7, y = 5, xend = 3, yend = 5.8),
@@ -214,7 +212,7 @@ p <- p +
     color = "black"
   )
 
-  # white background
+# white background
 p <- p + theme(
   panel.background = element_rect(fill = "white"),
   plot.background = element_rect(fill = "white"),
