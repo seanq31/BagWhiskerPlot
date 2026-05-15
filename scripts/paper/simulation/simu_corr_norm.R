@@ -107,7 +107,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    factor = 3, type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
+    factor = 3, type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "chisq",
     show.whiskers = TRUE, show.loophull = FALSE, center_type = center_type,
@@ -137,7 +137,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    factor = 3, type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
+    factor = 3, type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "F",
     show.whiskers = TRUE, show.loophull = FALSE, center_type = center_type,
@@ -256,10 +256,10 @@ for (i in 1:length(img_prefixes)) {
     "(a) Unadjusted\n      (Rousseeuw et al. 1999)",
     "(b) Chi-square approximation\n      FWER, q=0.1",
     "(c) Chi-square approximation\n      FDR, q=0.1",
-    "(d) Chi-square approximation\n      PFER, q=0.1",
+    "(d) Chi-square approximation\n      PFER, q=0.5",
     "(e) F approximation\n      FWER, q=0.1",
     "(f) F approximation\n     FDR, q=0.1",
-    "(g) F approximation\n      PFER, q=0.1"
+    "(g) F approximation\n      PFER, q=0.5"
   )
 
   grobs <- append(grobs, list(grid::nullGrob()), after = 4)

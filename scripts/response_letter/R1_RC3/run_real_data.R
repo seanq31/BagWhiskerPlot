@@ -101,7 +101,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    factor = 3, type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1,
+    factor = 3, type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "chisq",
     show.whiskers = TRUE, show.loophull = FALSE, center_type = center_type,
@@ -131,7 +131,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    factor = 3, type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1,
+    factor = 3, type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "F",
     show.whiskers = TRUE, show.loophull = FALSE, center_type = center_type,
@@ -234,16 +234,16 @@ grobs <- c(lapply(img_paths, read_img_grob))
 labels <- c(
   "(a) Chi-square approximation, FWER, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
   "(b) Chi-square approximation, FDR, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
-  "(c) Chi-square approximation, PFER, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
+  "(c) Chi-square approximation, PFER, q=0.5\n      Data from Figure 1 of Rousseeuw et al. 1999",
   "(d) F approximation, FWER, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
   "(e) F approximation, FDR, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
-  "(f) F approximation, PFER, q=0.1\n      Data from Figure 1 of Rousseeuw et al. 1999",
+  "(f) F approximation, PFER, q=0.5\n      Data from Figure 1 of Rousseeuw et al. 1999",
   "(g) Chi-square approximation, FWER, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
   "(h) Chi-square approximation, FDR, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
-  "(i) Chi-square approximation, PFER, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
+  "(i) Chi-square approximation, PFER, q=0.5\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
   "(j) F approximation, FWER, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
   "(k) F approximation, FDR, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999",
-  "(l) F approximation, PFER, q=0.1\n      Data from Figure 3(a) of Rousseeuw et al. 1999"
+  "(l) F approximation, PFER, q=0.5\n      Data from Figure 3(a) of Rousseeuw et al. 1999"
 )
 labeled <- mapply(function(g, lb) {
   ggdraw() +

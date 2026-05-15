@@ -106,7 +106,7 @@ for (setting_idx in 1:nrow(all_settings)) {
 
   old <- Sys.time()
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    factor = 3, type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1, precision = 3,
+    factor = 3, type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 1, pch = 1, precision = 3,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "chisq", # debug.plots='all',
     show.whiskers = TRUE, show.loophull = FALSE, center_type = center_type,

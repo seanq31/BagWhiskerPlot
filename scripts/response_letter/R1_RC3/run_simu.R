@@ -140,7 +140,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
+    type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
     show.outlier = TRUE, show.loophull = FALSE,
     show.bagpoints = TRUE, dkmethod = 1, center_type = center_type,
     show.whiskers = TRUE, asymp_dist_pv = "chisq", whisker.end.prop = 0.7,
@@ -170,7 +170,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   bgplts <- c(bgplts, list(tmp_plt))
 
   tmp_plt <- BagWhiskerPlot::bag_whisker(dat,
-    type1 = "PFER", q = 0.1, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
+    type1 = "PFER", q = 0.5, normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6, pch = 1,
     show.outlier = TRUE, show.loophull = FALSE,
     show.bagpoints = TRUE, dkmethod = 1, center_type = center_type,
     show.whiskers = TRUE, asymp_dist_pv = "F", whisker.end.prop = 0.7,
@@ -277,16 +277,16 @@ grobs <- c(lapply(img_paths, read_img_grob))
 labels <- c(
   "(a) Chi-square approximation, FWER, q=0.1\n      Normal mixture data",
   "(b) Chi-square approximation, FDR, q=0.1\n      Normal mixture data",
-  "(c) Chi-square approximation, PFER, q=0.1\n      Normal mixture data",
+  "(c) Chi-square approximation, PFER, q=0.5\n      Normal mixture data",
   "(d) F approximation, FWER, q=0.1\n      Normal mixture data",
   "(e) F approximation, FDR, q=0.1\n      Normal mixture data",
-  "(f) F approximation, PFER, q=0.1\n      Normal mixture data",
+  "(f) F approximation, PFER, q=0.5\n      Normal mixture data",
   "(g) Chi-square approximation, FWER, q=0.1\n      Log-normal data",
   "(h) Chi-square approximation, FDR, q=0.1\n      Log-normal data",
-  "(i) Chi-square approximation, PFER, q=0.1\n      Log-normal data",
+  "(i) Chi-square approximation, PFER, q=0.5\n      Log-normal data",
   "(j) F approximation, FWER, q=0.1\n      Log-normal data",
   "(k) F approximation, FDR, q=0.1\n      Log-normal data",
-  "(l) F approximation, PFER, q=0.1\n      Log-normal data"
+  "(l) F approximation, PFER, q=0.5\n      Log-normal data"
 )
 
 labeled <- mapply(function(g, lb) {
