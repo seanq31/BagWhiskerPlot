@@ -170,7 +170,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   png(file.path(save_dir, paste0("rd_bagplotpaper/", dist_type), paste0(fig_title, "_aplpack.png")), width = 3, height = 3, units = "in", res = 300)
   par(mar = c(3.5, 3.5, 3.3, 1.5), mgp = c(1.5, 0.5, 0))
   bo_apl <- aplpack::bagplot(dat[1:10, ],
-    factor = 3, type1 = "unadjusted", normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6,
+    factor = 3, type1 = "unadjusted", normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop,#ß cex = 1.0,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "F",
     show.whiskers = FALSE, show.loophull = TRUE, center_type = center_type,
@@ -181,7 +181,7 @@ for (setting_idx in 1:nrow(all_settings)) {
   png(file.path(save_dir, paste0("rd_bagplotpaper/", dist_type), paste0(fig_title, "_aplpack.png")), width = 3, height = 3, units = "in", res = 300)
   par(mar = c(3.5, 3.5, 3.3, 1.5), mgp = c(1.5, 0.5, 0))
   bo_apl <- aplpack::bagplot(dat,
-    factor = 3, type1 = "unadjusted", normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop, cex = 0.6,
+    factor = 3, type1 = "unadjusted", normal_inlier = normal_inlier, normal_outter = normal_outter, conservative_lambda = conservative_lambda, create.plot = TRUE, approx.limit = 10000, redefine_loop = redefine_loop,# cex = 1.0,
     show.outlier = TRUE, show.looppoints = TRUE, whisker.end.prop = 0.7,
     show.bagpoints = TRUE, dkmethod = 1, asymp_dist_pv = "F",
     show.whiskers = FALSE, show.loophull = TRUE, center_type = center_type,
@@ -249,29 +249,38 @@ for (i in 1:length(img_prefixes)) {
   labels <- c(
     "(a) Unadjusted\n      (Rousseeuw et al. 1999)",
     "(b) Chi-square approximation\n      FWER, q=0.1",
-    "(c) Chi-square approximation\n      FDR, q=0.1",
-    "(d) Chi-square approximation\n      PFER, q=0.5",
-    "(e) F approximation\n      FWER, q=0.1",
-    "(f) F approximation\n     FDR, q=0.1",
+    "(d) Chi-square approximation\n      FDR, q=0.1",
+    "(f) Chi-square approximation\n      PFER, q=0.5",
+    "(c) F approximation\n      FWER, q=0.1",
+    "(e) F approximation\n     FDR, q=0.1",
     "(g) F approximation\n      PFER, q=0.5"
   )
 
-  grobs <- append(grobs, list(grid::nullGrob()), after = 4)
-  labels <- append(labels, "", after = 4)
+  grobs <- c(grobs[1:2], grobs[5], list(grid::nullGrob()), grobs[3], grobs[6], list(grid::nullGrob()), grobs[4], grobs[7])
+  labels <- c(labels[1:2], labels[5], "", labels[3], labels[6], "", labels[4], labels[7])
 
   labeled <- mapply(function(g, lb) {
-    ggdraw() +
-      draw_grob(g, x = 0, y = 0, width = 1, height = 0.95) +
-      draw_label(lb,
-        x = 0, y = 0.98, hjust = 0, vjust = 1,
-        fontface = "bold", size = 26, color = "black"
-      )
+    if (grepl("Unadjusted", lb)) {
+      ggdraw() +
+        draw_grob(g, x = 0, y = 0, width = 1.05, height = 1.0) +
+        draw_label(lb,
+          x = 0, y = 0.98, hjust = 0, vjust = 1,
+          fontface = "bold", size = 26, color = "black"
+        )
+    } else {
+      ggdraw() +
+        draw_grob(g, x = 0, y = 0, width = 1, height = 0.95) +
+        draw_label(lb,
+          x = 0, y = 0.98, hjust = 0, vjust = 1,
+          fontface = "bold", size = 26, color = "black"
+        )
+    }
   }, grobs, labels, SIMPLIFY = FALSE)
 
-  combined <- plot_grid(plotlist = labeled, ncol = 4)
+  combined <- plot_grid(plotlist = labeled, ncol = 3)
   ggsave(
     filename = file.path(save_dir, img_names[i]),
     plot = combined,
-    width = 24, height = 12, dpi = 300, bg = "white"
+    width = 16, height = 18, dpi = 300, bg = "white"
   )
 }

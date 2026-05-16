@@ -13,6 +13,9 @@ set.seed(1234)
 # Next: Define where figures will be written.
 # ==============================================================================
 save_dir <- "./figures/"
+if (!dir.exists(save_dir)) {
+  dir.create(save_dir)
+}
 
 # ==============================================================================
 # Step 3: Define toy example data
@@ -170,9 +173,9 @@ p <- ggplot(df_toy, aes(x = x, y = y, color = color, shape = ptype)) +
     aes(label = label),
     parse = TRUE,
     vjust = 1.8,
-    nudge_x = c(-6.6, -0.65, -0.05, -1.85, -0.95, -0.85, -0.65, -0.9),
-    nudge_y = c(2.2, 2.5, 0, 0, 0.2, 0.2, 2.4, 0),
-    size = 6,
+    nudge_x = c(-6.1, -0.65, -0.05, -1.35, -0.75, -0.75, -0.65, -0.9),
+    nudge_y = c(2.1, 2.3, 0, 0, 0.2, 0.2, 2.4, 0),
+    size = 5,
     color = "black",
     show.legend = FALSE
   ) +
